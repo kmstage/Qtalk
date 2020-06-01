@@ -1,7 +1,15 @@
 {% extends "base.html" %}
 {% block content %}
+
   {% for post in posts %}
-    <h2>By {{ post.username }} on {{ post.date_posted }}</h2>
-    <p>{{ post.content }}</p>
+  <article class="media content-section">
+        <div class="media-body">
+          <div class="article-metadata">
+            <a class="mr-4" href="#">{{ post.username }}</a>
+            <small class="text-muted ml-2">{{ post.date_posted }}</small>
+          </div>
+          <p class="article-content rtl float-right">{{ post.content }}</p>
+        </div>
+      </article>
   {% endfor %}
 {% endblock content %}
