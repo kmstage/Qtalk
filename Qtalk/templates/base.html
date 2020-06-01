@@ -8,11 +8,11 @@
     </style>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.rtlcss.com/bootstrap/v4.2.1/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="static/css/main.css">
 
     {% if title %}
-      <title>title</title>
+      <title>{{title}}</title>
     {% else %}
       <title>Qtalk!</title>
     {% endif %}
@@ -28,14 +28,12 @@
             <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse" id="navbarToggle">
-            <div class="navbar-nav mr-auto">
-              <a class="nav-item nav-link" href="/">خانه</a>
-              <a class="nav-item nav-link" href="/about">درباره ما</a>
-            </div>
-            <!-- Navbar Right Side -->
-            <div class="navbar-nav">
-              <a class="nav-item nav-link" href="/login">ورود</a>
-              <a class="nav-item nav-link" href="/register">ثبت نام</a>
+            <div class="navbar-nav mr-auto ">
+              <a class="nav-item nav-link " href="{{ url_for('about') }}">درباره ما</a>
+              <a class="nav-item nav-link " href="{{ url_for('register') }}">ثبت نام</a>
+              <a class="nav-item nav-link " href="{{ url_for('login') }}">ورود</a>
+              <a class="nav-item nav-link " href="{{ url_for('home') }}">خانه</a>
+
             </div>
           </div>
         </div>
@@ -45,6 +43,15 @@
     <main role="main" class="container">
       <div class="row">
         <div class="col-md-12">
+          {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                  {% for category, message in messages %}
+                      <div class="alert alert-{{ category }}">
+                          {{ message }}
+                      </div>
+                  {% endfor %}
+              {% endif %}
+          {% endwith %}
           {% block content %}{% endblock %}
         </div>
       </div>
