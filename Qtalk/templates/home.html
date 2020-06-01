@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block content %}
+  {% for post in posts %}
+    <h2>By {{ post.username }} on {{ post.date_posted }}</h2>
+    <p>{{ post.content }}</p>
+  {% endfor %}
+{% endblock content %}
