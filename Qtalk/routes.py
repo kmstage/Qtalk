@@ -1,12 +1,8 @@
-from flask import Flask, render_template, url_for, flash, redirect
-from flask_sqlalchemy import SQLAlchemy
-from forms import RegistrationForm, LoginForm
+from flask import render_template, url_for, flash, redirect
+from Qtalk import app
+from Qtalk.forms import RegistrationForm, LoginForm
+from Qtalk.models import Post, User
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = '50bec9ca1cabe7bee53088c068b7524f'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
-
-db = SQLAlchemy(app)
 
 posts = [
     {'username': 'Kaveh.m',
@@ -18,6 +14,8 @@ posts = [
      'date_posted': 'jun 2, 2020'
      }
 ]
+
+
 
 
 @app.route('/')
@@ -49,6 +47,3 @@ def login():
             flash('نام کاربری یا کلمه عبور اشتباه است', 'danger')
 
     return render_template('login.html', title='ورود', form=form)
-
-if __name__ == "__main__" :
-    app.run('0.0.0.0', 5000, debug=True)
