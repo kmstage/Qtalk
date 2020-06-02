@@ -1,4 +1,6 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileAllowed
+from flask_login import current_user
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from Qtalk.models import User
@@ -38,3 +40,22 @@ class LoginForm(FlaskForm):
     remember = BooleanField('مرا به خاطر بسپار')
 
     submit = SubmitField('ورود')
+
+class UpdateAccountForm(FlaskForm):
+
+    email = StringField('ایمیل',
+            validators=[DataRequired(), Email()])
+
+    picture = FileField('آواتار جدید',
+            validators=[FileAllowed(['jpg', 'png'])])
+
+    status = StringField('استاتوس',
+            validators=[DataRequired(), Length(min=1, max=200)])
+
+    submit = SubmitField('بروزرسانی')
+
+    def validate_email(self, email):
+        if email.data != current_user.email:
+            user = User.query.filter_by(email=email.data).first()
+            if user:
+                raise ValidationError('ایمیل شما قبلا ثبت شده')

@@ -6,6 +6,8 @@ __pycache__/
 # C extensions
 *.so
 
+profile_pics
+
 # Distribution / packaging
 .Python
 build/

@@ -6,9 +6,11 @@
         <div class="media-body">
           <div class="article-metadata">
             <a class="mr-4 float-right" href="#">{{ post.username }}</a>
-            <small class="text-muted ml-2 ">{{ post.date_posted }}</small>
+            <small class="text-muted ml-2  ">{{ post.date_posted }}</small>
           </div>
-          <p class="article-content rtl ">{{ post.content }}</p>
+          <p class="article-content rtl mt-4">{{ post.content }}</p>
+          <hr class="">
+          <small class="text-muted">{{ current_user.status }}</small>
         </div>
       </article>
   {% endfor %}
