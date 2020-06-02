@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
-from wtforms.validators import DataRequired, Length, Email, EqualTo
+from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
+from Qtalk.models import User
 
 class RegistrationForm(FlaskForm):
     username = StringField('نام کاربری',
@@ -16,6 +17,16 @@ class RegistrationForm(FlaskForm):
             validators=[DataRequired(), EqualTo('password')])
 
     submit = SubmitField('!ثبت نام')
+
+    def validate_username(self, username):
+        user = User.query.filter_by(username=username.data).first()
+        if user:
+            raise ValidationError('نام کاربری مورد نظر موجوده ... لطفا یه نام دیگه انتخاب کن')
+
+    def validate_email(self, email):
+        user = User.query.filter_by(email=email.data).first()
+        if user:
+            raise ValidationError('ایمیل شما قبلا ثبت شده ... اگه کلمه عبورتون رو فراموش کردین ... حسابتون رو بازیابی کنیدا')
 
 class LoginForm(FlaskForm):
     username = StringField('نام کاربری',

@@ -30,8 +30,13 @@
           <div class="collapse navbar-collapse" id="navbarToggle">
             <div class="navbar-nav mr-auto ">
               <a class="nav-item nav-link " href="{{ url_for('about') }}">درباره ما</a>
-              <a class="nav-item nav-link " href="{{ url_for('register') }}">ثبت نام</a>
-              <a class="nav-item nav-link " href="{{ url_for('login') }}">ورود</a>
+              {% if current_user.is_authenticated %}
+                  <a class="nav-item nav-link " href="{{ url_for('logout') }}">خروج</a>
+                  <a class="nav-item nav-link " href="{{ url_for('account') }}">حساب کاربری</a>
+              {% else %}
+                  <a class="nav-item nav-link " href="{{ url_for('register') }}">ثبت نام</a>
+                  <a class="nav-item nav-link " href="{{ url_for('login') }}">ورود</a>
+              {% endif %}
               <a class="nav-item nav-link " href="{{ url_for('home') }}">خانه</a>
 
             </div>
