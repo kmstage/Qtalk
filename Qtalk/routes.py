@@ -2,7 +2,7 @@ from secrets import token_hex
 from os.path import splitext, join
 from flask import render_template, url_for, flash, redirect, request
 from Qtalk import app, db, bcrypt
-from Qtalk.forms import RegistrationForm, LoginForm, UpdateAccountForm
+from Qtalk.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm
 from Qtalk.models import Post, User
 from flask_login import login_user, current_user, logout_user, login_required
 from PIL import Image
@@ -98,3 +98,12 @@ def account():
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
     return render_template('account.html', title='حساب کاربری',
                             image_file=image_file, form=form)
+
+@app.route("/new_post", methods=['GET', 'POST'])
+@login_required
+def new_post():
+    form = PostForm()
+    if form.validate_on_submit():
+        flash('پست شما ایجاد شد', 'success')
+        return redirect(url_for('home'))
+    return render_template('create_post.html', title='ارسال جدید', form=form)

@@ -1,9 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
   <div class="content-section">
-    <div class="d-flex flex-row-reverse">
-      <div class="p-2"><h3>! وارد شوید</h3></div>
-    </div>
+    <legend class="border-bottom mb-4">وارد شوید</legend>
+
       <form method="POST" action="">
           {{ form.hidden_tag() }}
           <filfieldset class="form-group ">

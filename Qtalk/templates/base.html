@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="fa" dir="rtl">
   <head>
     <style>
     p.rtl {
@@ -20,30 +20,52 @@
   <body>
     <header class="site-header">
       <nav class="navbar navbar-expand-md navbar-dark fixed-top" style="background-color: #46403d;">
-        <div class="container">
-          <a class="navbar-brand" href="#">
-            <img src="static/logo/logo.png" width="150" height="30" alt="">
-          </a>
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+    <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item ">
+                <a class="nav-link" href="{{ url_for('home') }}">خانه</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('new_post') }}">ارسال پست</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('about') }}">درباره</a>
+            </li>
+        </ul>
+    </div>
+    <div class="mx-auto order-0">
+        <a class="navbar-brand mx-auto" href="#">
+          <img src="static/logo/logo.png" width="200" height="30" alt="">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".dual-collapse2">
             <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarToggle">
-            <div class="navbar-nav mr-auto ">
-              <a class="nav-item nav-link " href="{{ url_for('about') }}">درباره ما</a>
-              {% if current_user.is_authenticated %}
-                  <a class="nav-item nav-link " href="{{ url_for('logout') }}">خروج</a>
-                  <a class="nav-item nav-link " href="{{ url_for('account') }}">حساب کاربری</a>
-              {% else %}
-                  <a class="nav-item nav-link " href="{{ url_for('register') }}">ثبت نام</a>
-                  <a class="nav-item nav-link " href="{{ url_for('login') }}">ورود</a>
-              {% endif %}
-              <a class="nav-item nav-link " href="{{ url_for('home') }}">خانه</a>
+        </button>
+    </div>
+    <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
+        <ul class="navbar-nav ml-auto">
+          {% if current_user.is_authenticated %}
+              <li class="nav-item">
+                  <a class="nav-link" href="{{ url_for('account') }}">حساب کاربری</a>
+              </li>
 
-            </div>
-          </div>
-        </div>
+              <li class="nav-item">
+                  <a class="nav-link" href="{{ url_for('logout') }}"> خروج</a>
+              </li>
 
-      </nav>
+          {% else %}
+
+          <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('login') }}">ورود</a>
+          </li>
+
+          <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('register') }}">ثبت نام</a>
+          </li>
+          {% endif %}
+
+        </ul>
+    </div>
+</nav>
     </header>
     <main role="main" class="container">
       <div class="row">
