@@ -26,8 +26,8 @@ h1, h2, h3, h4, h5, h6 {
 
 .content-section {
   background: #ffffff;
-  padding: 10px 20px;
-  border: 1px solid #dddddd;
+  padding: 20px 30px;
+  border: 4px solid #dddddd;
   border-radius: 3px;
   margin-bottom: 20px;
 }
@@ -71,7 +71,8 @@ a.article-title:hover {
 .account-img {
   height: 125px;
   width: 125px;
-  margin-right: 20px;
+  float: left;
+  margin-right: 0px;
   margin-bottom: 16px;
 }
 

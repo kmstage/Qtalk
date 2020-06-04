@@ -1,30 +1,18 @@
 from secrets import token_hex
 from os.path import splitext, join
-from flask import render_template, url_for, flash, redirect, request
+from flask import render_template, url_for, flash, redirect, request, abort
 from Qtalk import app, db, bcrypt
-from Qtalk.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm
+from Qtalk.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, UpdateForm
 from Qtalk.models import Post, User
 from flask_login import login_user, current_user, logout_user, login_required
 from PIL import Image
-
-
-posts = [
-    {'username': 'Kaveh.m',
-     'content' : 'سلام ... این اولین پست کیوتاک! هستش :))))',
-     'date_posted': 'jun 1, 2020'
-     },
-     {'username': 'Kaveh.m',
-     'content' : 'البته هنوز خیلی چیزا مونده ....',
-     'date_posted': 'jun 2, 2020'
-     }
-]
-
 
 
 
 @app.route('/')
 @app.route('/home')
 def home():
+    posts = Post.query.all()
     return render_template('home.html', posts=posts)
 
 @app.route('/about')
@@ -99,11 +87,47 @@ def account():
     return render_template('account.html', title='حساب کاربری',
                             image_file=image_file, form=form)
 
-@app.route("/new_post", methods=['GET', 'POST'])
+@app.route("/post/new", methods=['GET', 'POST'])
 @login_required
 def new_post():
     form = PostForm()
     if form.validate_on_submit():
+        post = Post(content=form.content.data, author=current_user)
+        db.session.add(post)
+        db.session.commit()
         flash('پست شما ایجاد شد', 'success')
         return redirect(url_for('home'))
     return render_template('create_post.html', title='ارسال جدید', form=form)
+
+@app.route("/post/<int:post_id>")
+def post(post_id):
+    post = Post.query.get_or_404(post_id)
+    return render_template('post.html', title=post.author.username, post=post)
+
+@app.route("/post/<int:post_id>/update", methods=['GET', 'POST'])
+@login_required
+def update_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    if post.author != current_user:
+        abort(403)
+    form = UpdateForm()
+    if form.validate_on_submit():
+        post.content = form.content.data
+        db.session.commit()
+        flash('پست شما ویرایش شد', 'success')
+        return redirect(url_for('home'))
+    elif request.method == 'GET':
+        form.content.data = post.content
+    return render_template('update.html', title='ویرایش ارسال', form=form)
+
+
+@app.route("/post/<int:post_id>/delete", methods=['POST'])
+@login_required
+def delete_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    if post.author != current_user:
+        abort(403)
+    db.session.delete(post)
+    db.session.commit()
+    flash('پست شما حذف شد', 'success')
+    return redirect(url_for('home'))

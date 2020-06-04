@@ -2,16 +2,52 @@
 {% block content %}
 
   {% for post in posts %}
-  <article class="media content-section">
-        <div class="media-body">
-          <div class="article-metadata">
-            <a class="mr-4 float-right" href="#">{{ post.username }}</a>
-            <small class="text-muted ml-2  ">{{ post.date_posted }}</small>
+      <div class="card" style="margin-top:30px;">
+  <div class="card-body">
+    <img class="rounded-circle article-img float-right" src="{{ url_for('static', filename='profile_pics/'+ post.author.image_file) }}">
+
+      <h5 class="card-title">
+
+        <a class="mr-4 float-right" href="#">{{ post.author.username }}</a>
+      </h5>
+      <h6 class="card-subtitle mb-2 text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</h6>
+      {% if post.author == current_user %}
+          <div>
+            <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{{ url_for('update_post', post_id=post.id) }}">ویرایش</a>
+            <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal-{{ post.id }}">حذف</button>
           </div>
-          <p class="article-content rtl mt-4">{{ post.content }}</p>
-          <hr class="">
-          <small class="text-muted">{{ current_user.status }}</small>
-        </div>
-      </article>
+        {% endif %}
+      <hr>
+      <p class="card-text article-content ">{{ post.content }}</p>
+      <a href="#" class="card-link">Another link</a>
+    </div>
+  </div>
+
   {% endfor %}
+
+  {% for post in posts %}
+
+{% if post.author == current_user %}
+  <div class="modal fade" id="deleteModal-{{ post.id }}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModalLabel">از پاک شدن پست اطمینان داری؟</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">خروج</button>
+          <form action="{{ url_for('delete_post', post_id=post.id) }}" method="POST">
+            <input class="btn btn-danger" type="submit" value="حذف">
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+  {% endfor %}
+
 {% endblock content %}

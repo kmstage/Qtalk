@@ -50,7 +50,7 @@ class UpdateAccountForm(FlaskForm):
             validators=[FileAllowed(['jpg', 'png'])])
 
     status = StringField('استاتوس',
-            validators=[DataRequired(), Length(min=1, max=200)])
+            validators=[Length(min=0, max=200)])
 
     submit = SubmitField('بروزرسانی')
 
@@ -63,3 +63,7 @@ class UpdateAccountForm(FlaskForm):
 class PostForm(FlaskForm):
     content = TextAreaField('پست جدید', validators=[DataRequired()])
     submit = SubmitField('ارسال')
+
+class UpdateForm(FlaskForm):
+    content = TextAreaField('پست جدید', validators=[DataRequired()])
+    submit = SubmitField('ویرایش')

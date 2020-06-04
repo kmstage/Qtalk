@@ -9,7 +9,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://cdn.rtlcss.com/bootstrap/v4.2.1/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="static/css/main.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}">
 
     {% if title %}
       <title>{{title}}</title>
@@ -35,7 +35,7 @@
     </div>
     <div class="mx-auto order-0">
         <a class="navbar-brand mx-auto" href="#">
-          <img src="static/logo/logo.png" width="200" height="30" alt="">
+          <img src="{{ url_for('static', filename='logo/logo.png') }}" width="200" height="30" alt="">
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".dual-collapse2">
             <span class="navbar-toggler-icon"></span>

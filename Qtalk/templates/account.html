@@ -2,16 +2,16 @@
 {% block content %}
   <div class="content-section">
     <div class="media">
-      <img class="rounded-circle account-img" src="{{ image_file }}">
+      <img class="rounded-circle account-img  order-3 dual-collapse2" src="{{ image_file }}">
       <div class="media-body">
-        <h2 class="account-heading">{{ current_user.username }}</h2>
-        <p class="text-secondary mt-2">{{ current_user.email }}</p>
+        <h2 class="account-heading" style="margin-top:40px;">{{ current_user.username }}</h2>
       </div>
     </div>
-
+      <p class="text-secondary" style="vertical-align: middle">{{ current_user.email }}</p>
       <form method="POST" action="" enctype="multipart/form-data">
           {{ form.hidden_tag() }}
           <fieldset class="form-group">
+
               <legend class="border-bottom mb-4">اطلاعات حساب</legend>
 
               <div class="form-group">

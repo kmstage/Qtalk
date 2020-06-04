@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+
+  <div class="card" style="margin-top:30px;">
+<div class="card-body">
+<img class="rounded-circle article-img float-right" src="{{ url_for('static', filename='profile_pics/'+ post.author.image_file) }}">
+
+  <h5 class="card-title">
+
+    <a class="mr-4 float-right" href="#">{{ post.author.username }}</a>
+  </h5>
+  <h6 class="card-subtitle mb-2 text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</h6>
+  <hr>
+  <p class="card-text article-content ">{{ post.content }}</p>
+  <a href="#" class="card-link">Another link</a>
+</div>
+</div>
+
+{% endblock content %}
