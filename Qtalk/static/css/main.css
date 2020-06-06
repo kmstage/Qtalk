@@ -79,3 +79,14 @@ a.article-title:hover {
 .account-heading {
   font-size: 2.5rem;
 }
+
+.fixedbutton {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  background-image: none;
+  z-index: 99;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}

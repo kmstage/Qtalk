@@ -12,9 +12,10 @@ from PIL import Image
 @app.route('/home')
 def home():
     form = UpdateForm()
+    postform = PostForm()
     page = request.args.get('page', 1, type=int)
     posts = Post.query.order_by(Post.date_posted.desc()).paginate(page=page, per_page=25)
-    return render_template('home.html', posts=posts, form=form)
+    return render_template('home.html', posts=posts, form=form, form2=postform)
 
 @app.route('/about')
 def about():
