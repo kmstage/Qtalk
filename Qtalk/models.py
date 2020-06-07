@@ -1,4 +1,4 @@
-from Qtalk import db, login_manager
+from Qtalk import db, login_manager, app
 from datetime import datetime
 from flask_login import UserMixin
 
