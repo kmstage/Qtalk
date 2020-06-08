@@ -2,11 +2,12 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
+from Qtalk.config import app_secret_key, db_password, db_name, db_server, db_username
 
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = '50bec9ca1cabe7bee53088c068b7524f'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+app.config['SECRET_KEY'] = app_secret_key
+app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://{db_username}:{db_password}@{db_server}/{db_name}'
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)

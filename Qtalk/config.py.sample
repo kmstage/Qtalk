@@ -1,0 +1,8 @@
+'''app config'''
+app_secret_key=''
+
+'''database config'''
+db_username=''
+db_password=''
+db_server=''
+db_name=''
