@@ -2,20 +2,52 @@ from secrets import token_hex
 from os.path import splitext, join
 from flask import render_template, url_for, flash, redirect, request, abort
 from Qtalk import app, db, bcrypt
-from Qtalk.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, UpdateForm
+from Qtalk.forms import (RegistrationForm, LoginForm,
+                UpdateAccountForm, PostForm, UpdateForm, EmptyForm)
 from Qtalk.models import Post, User
 from flask_login import login_user, current_user, logout_user, login_required
 from PIL import Image
-
+from datetime import datetime
 
 @app.route('/')
+def first_page():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username = form.username.data).first()
+        if user and bcrypt.check_password_hash(user.password,form.password.data):
+            login_user(user, remember=form.remember.data)
+            flash(f' {form.username.data} خوش آمدید', 'success')
+            next_page = request.args.get('next')
+            return redirect(next_page) if next_page else redirect(url_for('home'))
+        else:
+            flash('نام کاربری یا کلمه عبور اشتباه است', 'danger')
+
+    return render_template('first_page.html', form=form)
+
 @app.route('/home')
+@login_required
 def home():
     form = UpdateForm()
     postform = PostForm()
     page = request.args.get('page', 1, type=int)
+    posts = current_user.followed_posts().paginate(page=page, per_page=25)
+    return render_template('home.html', posts=posts, form=form, form2=postform, title="خانه")
+
+@app.before_request
+def before_request():
+    if current_user.is_authenticated:
+        current_user.last_seen = datetime.now()
+        db.session.commit()
+
+@app.route('/explore')
+def explore():
+    form = UpdateForm()
+    postform = PostForm()
+    page = request.args.get('page', 1, type=int)
     posts = Post.query.order_by(Post.date_posted.desc()).paginate(page=page, per_page=25)
-    return render_template('home.html', posts=posts, form=form, form2=postform)
+    return render_template('explore.html', posts=posts, form=form, form2=postform, title="کاوش")
 
 @app.route('/about')
 def about():
@@ -56,7 +88,7 @@ def login():
 @app.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('home'))
+    return redirect(url_for('first_page'))
 
 def save_picture(form_picture):
     random_hex = token_hex(8)
@@ -104,8 +136,9 @@ def new_post():
 
 @app.route("/post/<int:post_id>")
 def post(post_id):
+    form = UpdateForm()
     post = Post.query.get_or_404(post_id)
-    return render_template('post.html', title=post.author.username, post=post)
+    return render_template('post.html', title=post.author.username, post=post, form=form)
 
 @app.route("/post/<int:post_id>/update", methods=['GET', 'POST'])
 @login_required
@@ -118,7 +151,7 @@ def update_post(post_id):
         post.content = form.content.data
         db.session.commit()
         flash('پست شما ویرایش شد', 'success')
-        return redirect(url_for('home'))
+        return redirect(url_for('post',post_id=post.id))
     elif request.method == 'GET':
         form.content.data = post.content
     return render_template('update.html', title='ویرایش ارسال', form=form)
@@ -136,10 +169,52 @@ def delete_post(post_id):
     return redirect(url_for('home'))
 
 @app.route('/user/<string:username>')
-def user_post(username):
+def user(username):
+    form = EmptyForm()
+    form2 = UpdateForm()
     page = request.args.get('page', 1, type=int)
     user = User.query.filter_by(username=username).first_or_404()
     posts = Post.query.filter_by(author=user)\
     .order_by(Post.date_posted.desc())\
     .paginate(page=page, per_page=25)
-    return render_template('user_post.html', posts=posts, user=user)
+    return render_template('user_post.html', posts=posts,
+                user=user, form=form,
+                form2=form2, filename='/static/profile_pics/' + user.image_file)
+
+@app.route('/follow/<username>', methods=['POST'])
+@login_required
+def follow(username):
+    form = EmptyForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=username).first()
+        if user is None:
+            flash('کاربر مورد نظر یافت نشد', 'warning')
+            return redirect(url_for('explore'))
+        if user == current_user:
+            flash('خودتو ک نمیتونی فالو کنی :)', 'primary')
+            return redirect(url_for('explore'))
+        current_user.follow(user)
+        db.session.commit()
+        flash('شما {} را دنبال میکنید'.format(username), 'info')
+        return redirect(url_for('home'))
+    else:
+        return redirect(url_for('home'))
+
+@app.route('/unfollow/<username>', methods=['POST'])
+@login_required
+def unfollow(username):
+    form = EmptyForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=username).first()
+        if user is None:
+            flash('کاربر مورد نظر یافت نشد', 'warning')
+            return redirect(url_for('explore'))
+        if user == current_user:
+            flash('خودتو ک نمیتونی آنفالو کنی :)', 'primary')
+            return redirect(url_for('explore'))
+        current_user.unfollow(user)
+        db.session.commit()
+        flash('کاربر {} دنبال نمیشود'.format(username), 'info')
+        return redirect(url_for('user',username=username))
+    else:
+        return redirect(url_for('explore'))

@@ -67,3 +67,6 @@ class PostForm(FlaskForm):
 class UpdateForm(FlaskForm):
     content = TextAreaField('پست جدید', validators=[DataRequired()])
     submit = SubmitField('ویرایش')
+
+class EmptyForm(FlaskForm):
+    submit = SubmitField('Submit')

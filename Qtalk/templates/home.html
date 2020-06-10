@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <button type="button" class="fixedbutton btn" data-toggle="modal" data-target="#sendModal"><img src="{{url_for('static', filename='logo/add_btn.png')}}" width="65" height="65"></button>
-
+{% if posts.items %}
 <div style="direction:ltr;text-align: left">
   {% for page_num in posts.iter_pages(left_edge=2, right_edge=2, left_current=1, right_current=2) %}
         {% if page_num %}
@@ -23,7 +23,7 @@
 
       <h5 class="card-title">
 
-        <a class="mr-4 float-right" href="{{url_for('user_post', username=post.author.username)}}">{{ post.author.username }}</a>
+        <a class="mr-4 float-right" href="{{url_for('user', username=post.author.username)}}">{{ post.author.username }}</a>
       </h5>
       <h6 class="card-subtitle mb-2 text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</h6>
       {% if post.author == current_user %}
@@ -53,99 +53,113 @@
           {% endif %}
         {% endfor %}
       </div>
-  {% for post in posts.items %}
+
+{% else %}
+<div class="alert alert-danger" role="alert">
+شما هنوز کسی را دنبال نمیکنید!!!
+</div>
+<div class="alert alert-dark" role="alert">
+  <a href="{{ url_for('explore') }}">ارسال هایی ک دنبال نمیکنید را از بخش <b>کاوش</b> ببینید.</a>
+</div>
+
+<div class="alert alert-primary" role="alert">
+  This is a dark alert—check it out!
+</div>
+{% endif %}
+
+{% for post in posts.items %}
 
 {% if post.author == current_user %}
-  <div class="modal fade" id="deleteModal-{{ post.id }}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="deleteModalLabel">از پاک شدن پست اطمینان داری؟</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">خروج</button>
-          <form action="{{ url_for('delete_post', post_id=post.id) }}" method="POST">
-            <input class="btn btn-danger" type="submit" value="حذف">
-          </form>
-        </div>
+<div class="modal fade" id="deleteModal-{{ post.id }}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">از پاک شدن پست اطمینان داری؟</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">خروج</button>
+        <form action="{{ url_for('delete_post', post_id=post.id) }}" method="POST">
+          <input class="btn btn-danger" type="submit" value="حذف">
+        </form>
       </div>
     </div>
   </div>
+</div>
 
 
-  <div class="modal fade" id="editModal-{{ post.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">ویرایش ارسال</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form method="POST" action="{{ url_for('update_post',post_id=post.id) }}">
+<div class="modal fade" id="editModal-{{ post.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">ویرایش ارسال</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="{{ url_for('update_post',post_id=post.id) }}">
+          {{ form.hidden_tag() }}
+          <filfieldset class="form-group ">
+              <div class="form-group">
+                  {% if form.content.errors %}
+                  {{ form.content(class="form-control form-control-lg is-invalid", rows="12" ) }}
+                    <div class="invalid-feedback">
+                        {% for error in form.content.errors %}
+                          <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                  {% else %}
+                      {% set f = form.content.process_data(post.content) %}
+                      {{ form.content(class="form-control form-control-lg", rows="12") }}
+                  {% endif %}
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">انصراف</button>
+                  {{ form.submit(class="btn btn-outline-info") }}
+              </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% endfor %}
+<div class="modal fade" id="sendModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">ارسال جدید</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="{{ url_for('new_post') }}">
             {{ form.hidden_tag() }}
             <filfieldset class="form-group ">
                 <div class="form-group">
-                    {% if form.content.errors %}
-                    {{ form.content(class="form-control form-control-lg is-invalid", rows="12" ) }}
+                    {% if form2.content.errors %}
+                    {{ form2.content(class="form-control form-control-lg is-invalid") }}
                       <div class="invalid-feedback">
-                          {% for error in form.content.errors %}
+                          {% for error in form2.content.errors %}
                             <span>{{ error }}</span>
                           {% endfor %}
                       </div>
                     {% else %}
-                        {% set f = form.content.process_data(post.content) %}
-                        {{ form.content(class="form-control form-control-lg", rows="12") }}
+                        {{ form2.content(class="form-control form-control-lg", rows="10") }}
                     {% endif %}
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">انصراف</button>
-                    {{ form.submit(class="btn btn-outline-info") }}
+                    {{ form2.submit(class="btn btn-outline-info") }}
                 </div>
-          </form>
-        </div>
+        </form>
       </div>
     </div>
   </div>
-{% endif %}
-
-  {% endfor %}
-  <div class="modal fade" id="sendModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">ارسال جدید</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form method="POST" action="{{ url_for('new_post') }}">
-              {{ form.hidden_tag() }}
-              <filfieldset class="form-group ">
-                  <div class="form-group">
-                      {% if form2.content.errors %}
-                      {{ form2.content(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form2.content.errors %}
-                              <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                      {% else %}
-                          {{ form2.content(class="form-control form-control-lg", rows="10") }}
-                      {% endif %}
-                  </div>
-                  <div class="modal-footer">
-                      <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">انصراف</button>
-                      {{ form2.submit(class="btn btn-outline-info") }}
-                  </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
+</div>
 {% endblock content %}

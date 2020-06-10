@@ -7,6 +7,19 @@
         <h2 class="account-heading" style="margin-top:40px;">{{ current_user.username }}</h2>
       </div>
     </div>
+    <div class="row">
+      <div class="col " align="center">
+          <h5>
+            {{ current_user.followers.count() }} <br/> <span> فالوور</span>
+          </h5>
+      </div>
+      <div class="col " align="center">
+          <h5>
+            {{ current_user.followed.count() }} <br/> <span>فالوئینگ </span>
+
+          </h5>
+      </div>
+    </div>
       <p class="text-secondary" style="vertical-align: middle">{{ current_user.email }}</p>
       <form method="POST" action="" enctype="multipart/form-data">
           {{ form.hidden_tag() }}
