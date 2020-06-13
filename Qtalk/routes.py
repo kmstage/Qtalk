@@ -1,6 +1,6 @@
 from secrets import token_hex
 from os.path import splitext, join
-from flask import render_template, url_for, flash, redirect, request, abort
+from flask import render_template, url_for, flash, redirect, request, abort, jsonify
 from Qtalk import app, db, bcrypt
 from Qtalk.forms import (RegistrationForm, LoginForm,
                 UpdateAccountForm, PostForm, UpdateForm, EmptyForm)
@@ -77,7 +77,7 @@ def login():
         user = User.query.filter_by(username = form.username.data).first()
         if user and bcrypt.check_password_hash(user.password,form.password.data):
             login_user(user, remember=form.remember.data)
-            flash(f' {form.username.data} خوش آمدید', 'success')
+            flash(f' خوش آمدید {form.username.data}', 'success')
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('home'))
         else:
@@ -104,6 +104,10 @@ def save_picture(form_picture):
 @app.route('/account', methods=['GET', 'POST'])
 @login_required
 def account():
+    page = request.args.get('page', 1, type=int)
+    posts = Post.query.filter_by(author=current_user)\
+    .order_by(Post.date_posted.desc())\
+    .paginate(page=page, per_page=25)
     form = UpdateAccountForm()
     if form.validate_on_submit():
         if form.picture.data:
@@ -120,7 +124,7 @@ def account():
 
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
     return render_template('account.html', title='حساب کاربری',
-                            image_file=image_file, form=form)
+                            image_file=image_file, form=form, posts=posts)
 
 @app.route("/post/new", methods=['GET', 'POST'])
 @login_required
@@ -218,3 +222,49 @@ def unfollow(username):
         return redirect(url_for('user',username=username))
     else:
         return redirect(url_for('explore'))
+
+@app.route('/like/<int:post_id>/<action>')
+@login_required
+def like_action(post_id, action):
+    post = Post.query.filter_by(id=post_id).first_or_404()
+    if action == 'like':
+        current_user.like_post(post)
+        db.session.commit()
+        likes = post.likes.count()
+        dislikes = post.dislikes.count()
+        result = f"{likes} لایک و {dislikes} دیسلایک"
+        return jsonify(post_id = post_id,
+                       state = 'like',
+                       result = result)
+    if action == 'unlike':
+        current_user.unlike_post(post)
+        db.session.commit()
+        likes = post.likes.count()
+        dislikes = post.dislikes.count()
+        result = f"{likes} لایک و {dislikes} دیسلایک"
+        return jsonify(post_id = post_id,
+                       state = 'unlike',
+                       result = result)
+
+@app.route('/dislike/<int:post_id>/<action>')
+@login_required
+def dislike_action(post_id, action):
+    post = Post.query.filter_by(id=post_id).first_or_404()
+    if action == 'dislike':
+        current_user.dislike_post(post)
+        db.session.commit()
+        likes = post.likes.count()
+        dislikes = post.dislikes.count()
+        result = f"{likes} لایک و {dislikes} دیسلایک"
+        return jsonify(post_id = post_id,
+                       state = 'dislike',
+                       result = result)
+    if action == 'undislike':
+        current_user.undislike_post(post)
+        db.session.commit()
+        likes = post.likes.count()
+        dislikes = post.dislikes.count()
+        result = f"{likes} لایک و {dislikes} دیسلایک"
+        return jsonify(post_id = post_id,
+                       state = 'undislike',
+                       result = result)

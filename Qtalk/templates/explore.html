@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
+{% if current_user.is_authenticated %}
 <button type="button" class="fixedbutton btn" data-toggle="modal" data-target="#sendModal"><img src="{{url_for('static', filename='logo/add_btn.png')}}" width="65" height="65"></button>
-
+{% endif %}
 <div style="direction:ltr;text-align: left">
   {% for page_num in posts.iter_pages(left_edge=2, right_edge=2, left_current=1, right_current=2) %}
         {% if page_num %}
@@ -34,8 +35,36 @@
         {% endif %}
       <hr>
       <p class="card-text article-content ">{{ post.content }}</p>
+      {% if post.author.status %}
       <hr style="margin-top:30px; ">
       <small>{{post.author.status}}</small>
+      {% endif %}
+    </div>
+    <div class="">
+      {% if post.author != current_user %}
+
+          {% if current_user.has_liked_post(post) %}
+            <button type="button" id="like-{{post.id}}" class="btn btn-outline-success like_btn btn-sm ml-1 mr-1" style="display:none">لایک</button>
+            <button type="button" id="dislike-{{post.id}}" class="btn btn-outline-danger dislike_btn btn-sm ml-1 mr-1" style="display:none">دیسلایک</button>
+            <button type="button" id="unlike-{{post.id}}" class="btn btn-success unlike_btn btn-sm ml-1 mr-1" style="display:inline">لایک شده</button>
+            <button type="button" id="undislike-{{post.id}}" class="btn btn-danger undislike_btn btn-sm ml-1 mr-1" style="display:none">دیسلایک شده</button>
+          {% elif current_user.has_disliked_post(post) %}
+            <button type="button" id="like-{{post.id}}" class="btn btn-outline-success like_btn btn-sm ml-1 mr-1" style="display:none">لایک</button>
+            <button type="button" id="dislike-{{post.id}}" class="btn btn-outline-danger dislike_btn btn-sm ml-1 mr-1" style="display:none">دیسلایک</button>
+            <button type="button" id="unlike-{{post.id}}" class="btn btn-success unlike_btn btn-sm ml-1 mr-1" style="display:none">لایک شده</button>
+            <button type="button" id="undislike-{{post.id}}" class="btn btn-danger undislike_btn btn-sm ml-1 mr-1" style="display:inline">دیسلایک شده</button>
+          {% else %}
+            <button type="button" id="like-{{post.id}}" class="btn btn-outline-success like_btn btn-sm ml-1 mr-1" style="display:inline">لایک</button>
+            <button type="button" id="dislike-{{post.id}}" class="btn btn-outline-danger dislike_btn btn-sm ml-1 mr-1" style="display:inline">دیسلایک</button>
+            <button type="button" id="unlike-{{post.id}}" class="btn btn-success unlike_btn btn-sm ml-1 mr-1" style="display:none">لایک شده</button>
+            <button type="button" id="undislike-{{post.id}}" class="btn btn-danger undislike_btn btn-sm ml-1 mr-1" style="display:none">دیسلایک شده</button>
+          {% endif %}
+      {% endif %}
+      <p class="text-muted mr-4 mb-2" id="result-{{post.id}}" style="text-align:left">
+        {{ post.likes.count() }} لایک
+  و
+          {{ post.dislikes.count() }} دیسلایک
+      </p>
     </div>
   </div>
 

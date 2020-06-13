@@ -31,12 +31,43 @@
             <button type="button" onclick="myFunction()" class="btn btn-primary btn-sm m-1" data-toggle="modal" data-target="#editModal-{{ post.id }}">ویرایش</button>
             <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal-{{ post.id }}">حذف</button>
           </div>
-        {% endif %}
+      {% endif %}
       <hr>
       <p class="card-text article-content ">{{ post.content }}</p>
-      <hr style="margin-top:30px; ">
+      {% if post.author.status %}
+      <hr style="margin-top:20px; ">
       <small>{{post.author.status}}</small>
+      {% endif %}
     </div>
+    <div class="">
+      {% if post.author != current_user %}
+
+          {% if current_user.has_liked_post(post) %}
+            <button type="button" id="like-{{post.id}}" class="btn btn-outline-success like_btn btn-sm ml-1 mr-1" style="display:none">لایک</button>
+            <button type="button" id="dislike-{{post.id}}" class="btn btn-outline-danger dislike_btn btn-sm ml-1 mr-1" style="display:none">دیسلایک</button>
+            <button type="button" id="unlike-{{post.id}}" class="btn btn-success unlike_btn btn-sm ml-1 mr-1" style="display:inline">لایک شده</button>
+            <button type="button" id="undislike-{{post.id}}" class="btn btn-danger undislike_btn btn-sm ml-1 mr-1" style="display:none">دیسلایک شده</button>
+          {% elif current_user.has_disliked_post(post) %}
+            <button type="button" id="like-{{post.id}}" class="btn btn-outline-success like_btn btn-sm ml-1 mr-1" style="display:none">لایک</button>
+            <button type="button" id="dislike-{{post.id}}" class="btn btn-outline-danger dislike_btn btn-sm ml-1 mr-1" style="display:none">دیسلایک</button>
+            <button type="button" id="unlike-{{post.id}}" class="btn btn-success unlike_btn btn-sm ml-1 mr-1" style="display:none">لایک شده</button>
+            <button type="button" id="undislike-{{post.id}}" class="btn btn-danger undislike_btn btn-sm ml-1 mr-1" style="display:inline">دیسلایک شده</button>
+          {% else %}
+            <button type="button" id="like-{{post.id}}" class="btn btn-outline-success like_btn btn-sm ml-1 mr-1" style="display:inline">لایک</button>
+            <button type="button" id="dislike-{{post.id}}" class="btn btn-outline-danger dislike_btn btn-sm ml-1 mr-1" style="display:inline">دیسلایک</button>
+            <button type="button" id="unlike-{{post.id}}" class="btn btn-success unlike_btn btn-sm ml-1 mr-1" style="display:none">لایک شده</button>
+            <button type="button" id="undislike-{{post.id}}" class="btn btn-danger undislike_btn btn-sm ml-1 mr-1" style="display:none">دیسلایک شده</button>
+          {% endif %}
+      {% endif %}
+      <p class="text-muted mr-4 mb-2" id="result-{{post.id}}" style="text-align:left">
+        {{ post.likes.count() }} لایک
+  و
+          {{ post.dislikes.count() }} دیسلایک
+      </p>
+    </div>
+
+
+
   </div>
 
   {% endfor %}
@@ -59,12 +90,9 @@
 شما هنوز کسی را دنبال نمیکنید!!!
 </div>
 <div class="alert alert-dark" role="alert">
-  <a href="{{ url_for('explore') }}">ارسال هایی ک دنبال نمیکنید را از بخش <b>کاوش</b> ببینید.</a>
+   ارسال هایی که دنبال نمیکنید را از بخش <a href="{{ url_for('explore') }}"><b>کاوش</b></a> ببینید.
 </div>
 
-<div class="alert alert-primary" role="alert">
-  This is a dark alert—check it out!
-</div>
 {% endif %}
 
 {% for post in posts.items %}
