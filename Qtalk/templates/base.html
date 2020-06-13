@@ -33,6 +33,12 @@
                 <a class="nav-link" href="{{ url_for('explore') }}">کاوش</a>
             </li>
             <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('users') }}">کاربران</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('rules') }}">قوانین</a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('about') }}">درباره</a>
             </li>
         </ul>
@@ -42,7 +48,7 @@
           <span class="navbar-toggler-icon"></span>
       </button>
         <a class="navbar-brand mx-auto" href="#">
-          <img src="{{ url_for('static', filename='logo/logo.png') }}" width="200" height="30" alt="">
+          <img src="{{ url_for('static', filename='logo/logo.png') }}" width="250" height="35" alt="">
         </a>
     </div>
     <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">

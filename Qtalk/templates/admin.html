@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>تعداد کل پست ها : {{num_posts}} </h2>
+<br>
+<h2>تعداد کل کاربران : {{num_users}}</h2>
+<hr>
+<hr>
+{%for user in users%}
+<div class="card m-4 p-2">
+  <div class="card-header">
+    {{user.username}}
+  </div>
+  <div class="card-body">
+    <blockquote class="blockquote mb-0">
+      <p>{{user.email}}</p>
+      {% if user.status %}
+      <footer class="blockquote-footer">{{user.status}}</footer>
+      {% endif %}
+    </blockquote>
+  </div>
+</div>
+{%endfor%}
+{% endblock content%}

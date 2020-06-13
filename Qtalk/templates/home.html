@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<button type="button" class="fixedbutton btn" data-toggle="modal" data-target="#sendModal"><img src="{{url_for('static', filename='logo/add_btn.png')}}" width="65" height="65"></button>
+<button type="button" class="fixedbutton btn" data-toggle="modal" title="پست جدید" data-target="#sendModal"><img src="{{url_for('static', filename='logo/add_btn.png')}}" width="65" height="65"></button>
 {% if posts.items %}
 <div style="direction:ltr;text-align: left">
   {% for page_num in posts.iter_pages(left_edge=2, right_edge=2, left_current=1, right_current=2) %}
@@ -92,7 +92,12 @@
 <div class="alert alert-dark" role="alert">
    ارسال هایی که دنبال نمیکنید را از بخش <a href="{{ url_for('explore') }}"><b>کاوش</b></a> ببینید.
 </div>
-
+<div class="alert alert-dark" role="alert">
+    برای پیدا کردن افراد روی <a href="{{ url_for('users') }}"><b> کاربران </b></a>کلیک کنید.
+</div>
+<div class="alert alert-dark" role="alert">
+  قوانین را از بخش <a href="{{ url_for('rules') }}"><b> قوانین </b></a>ببینید.
+</div>
 {% endif %}
 
 {% for post in posts.items %}

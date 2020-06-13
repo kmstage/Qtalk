@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>کاربران</h1>
+{% if users.items %}
+<div style="direction:ltr;text-align: left">
+  {% for page_num in users.iter_pages(left_edge=2, right_edge=2, left_current=1, right_current=2) %}
+        {% if page_num %}
+          {% if users.page == page_num %}
+            <a class="btn btn-info" href="{{ url_for('users', page=page_num) }}">{{ page_num }}</a>
+          {% else %}
+            <a class="btn btn-outline-info" href="{{ url_for('users', page=page_num) }}">{{ page_num }}</a>
+          {% endif %}
+        {% else %}
+          ...
+        {% endif %}
+      {% endfor %}
+      {% endif %}
+
+    </div>
+{%for user in users.items%}
+<div class="card text-center m-4">
+  <div class="card-header">
+    {{user.username}}
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col " align="center">
+          <h5>
+            {{ user.followers.count() }} <br/> <span> فالوور</span>
+          </h5>
+      </div>
+      <div class="col" align="center">
+          <h5>
+            {{ user.followed.count() }} <br/> <span>فالوئینگ </span>
+
+          </h5>
+      </div>
+    </div>
+    {% if user.status %}
+    <p class="card-text">{{user.status}}</p>
+    {% endif %}
+    <a href="{{url_for('user', username= user.username)}}" class="btn btn-primary">بازدید از پروفایل</a>
+  </div>
+  <div class="card-footer text-muted">
+  آخرین بازدید در {{user.last_seen}}
+
+  </div>
+</div>
+{%endfor%}
+{% endblock content%}

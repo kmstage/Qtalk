@@ -1,4 +1,5 @@
 from secrets import token_hex
+from Qtalk.config import emails, usernames
 from os.path import splitext, join
 from flask import render_template, url_for, flash, redirect, request, abort, jsonify
 from Qtalk import app, db, bcrypt
@@ -268,3 +269,35 @@ def dislike_action(post_id, action):
         return jsonify(post_id = post_id,
                        state = 'undislike',
                        result = result)
+
+@app.route('/adminzone')
+@login_required
+def adminzone():
+    if current_user.email in emails and current_user.username in usernames:
+        users = User.query.all()
+        posts = Post.query.all()
+        num_users = len(users)
+        num_posts = len(posts)
+        return render_template('admin.html', users=users, posts=posts, num_users=num_users, num_posts=num_posts)
+    else:
+        return redirect(url_for('home'))
+
+@app.route('/users')
+@login_required
+def users():
+    page = request.args.get('page', 1, type=int)
+    users = User.query.order_by(User.date_register.desc()).paginate(page=page, per_page=50)
+    return render_template('users.html', users=users, title="کاربران")
+
+@app.route('/rules')
+def rules():
+    return render_template('rules.html',title="قوانین")
+
+@app.errorhandler(403)
+def forbiden(e):
+    flash("لطفا وارد شوید.","info")
+    return redirect(url_for('login'))
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('error.html',title='یافت نشد')

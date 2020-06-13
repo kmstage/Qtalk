@@ -6,3 +6,7 @@ db_username=''
 db_password=''
 db_server=''
 db_name=''
+
+'''admin data'''
+emails=['list of emails']
+usernames=['list of usernames']
