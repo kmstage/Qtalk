@@ -10,6 +10,19 @@ from flask_login import login_user, current_user, logout_user, login_required
 from PIL import Image
 from datetime import datetime
 
+
+def post_count(username):
+    user = User.query.filter_by(username=username).first_or_404()
+    posts = Post.query.filter_by(author=user).order_by(Post.date_posted.desc()).limit(5).all()
+    count = 0
+    today = datetime.now()
+    today = today.strftime('%Y-%m-%d')
+    for post in posts:
+        if post.date_posted.strftime('%Y-%m-%d') == today:
+            count +=1
+    return count
+
+
 @app.route('/')
 def first_page():
     if current_user.is_authenticated:
@@ -132,11 +145,15 @@ def account():
 def new_post():
     form = PostForm()
     if form.validate_on_submit():
-        post = Post(content=form.content.data, author=current_user)
-        db.session.add(post)
-        db.session.commit()
-        flash('پست شما ایجاد شد', 'success')
-        return redirect(url_for('home'))
+        if post_count(current_user.username) <= 3:
+            post = Post(content=form.content.data, author=current_user)
+            db.session.add(post)
+            db.session.commit()
+            flash('پست شما ایجاد شد', 'success')
+            return redirect(url_for('home'))
+        else:
+            flash('امروز بیشتر از ۴ پست ارسال کردید', 'warning')
+            return redirect(url_for('home'))
     return render_template('create_post.html', title='ارسال جدید', form=form)
 
 @app.route("/post/<int:post_id>")

@@ -5,9 +5,9 @@ __pycache__/
 
 # C extensions
 *.so
-
+.fandogh
 config.py
-
+app/Qtalk/static
 profile_pics
 
 # Distribution / packaging

@@ -7,7 +7,7 @@ from Qtalk.config import app_secret_key, db_password, db_name, db_server, db_use
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = app_secret_key
-app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://{db_username}:{db_password}@{db_server}/{db_name}'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://{db_username}:{db_password}@{db_server}/{db_name}?charset=utf8mb4'
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
