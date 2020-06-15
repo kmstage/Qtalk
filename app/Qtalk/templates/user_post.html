@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% block content %}
-
 <main role="main" class="container">
   <div class="row">
     <div class="col-md-4">
@@ -44,7 +43,7 @@
           {{ form.submit(value='فالو', class="btn btn-outline-success buttonp") }}
       </form>
   </p>
-      {% endif %}
+
   {% else %}
   <p>
       <form action="{{ url_for('unfollow', username=user.username) }}" method="post">
@@ -52,6 +51,7 @@
           {{ form.submit(value='آنفالو', class="btn btn-outline-danger buttonp") }}
       </form>
   </p>
+  {% endif %}
   {% endif %}
 </div>
     </div>

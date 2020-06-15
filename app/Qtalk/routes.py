@@ -20,7 +20,7 @@ def post_count(username):
     for post in posts:
         if post.date_posted.strftime('%Y-%m-%d') == today:
             count +=1
-    return count
+    return 1
 
 
 @app.route('/')
@@ -146,7 +146,8 @@ def new_post():
     form = PostForm()
     if form.validate_on_submit():
         if post_count(current_user.username) <= 3:
-            post = Post(content=form.content.data, author=current_user)
+            content = form.content.data.encode('utf-8')
+            post = Post(content=content, author=current_user)
             db.session.add(post)
             db.session.commit()
             flash('پست شما ایجاد شد', 'success')
