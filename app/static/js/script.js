@@ -26,6 +26,23 @@ if (data.state == 'like') {
 }
 }
 
+function followResponse(data){
+  console.log(data.result)
+  var username = data.target
+  var follower = data.follower
+  var following = data.following
+  $('#following_count-'+ username).html(following)
+  $('#followers_count-'+ username).html(follower)
+  if (data.result == 'followed') {
+      $('#u-'+ username).css('display', 'inline')
+      $('#f-'+ username).css('display', 'none')
+
+  } else if (data.result == 'unfollowed') {
+      $('#u-'+ username).css('display', 'none')
+      $('#f-'+ username).css('display', 'inline')
+}
+}
+
 function likeClick(e){
   var fid = $(this).attr('id');
   var id = fid.slice(5)
@@ -62,6 +79,23 @@ function undislikeClick(e){
   });
 }
 
+function followActionClick(e){
+  var id = $(this).attr('id');
+  var username = id.slice(2)
+  $.ajax('/follow/'+ username ,{
+    type: 'POST',
+    success: followResponse
+  });
+}
+function unfollowActionClick(e){
+  var id = $(this).attr('id');
+  var username = id.slice(2)
+  $.ajax('/unfollow/'+ username ,{
+    type: 'POST',
+    success: followResponse
+  });
+}
+
 $(document).ready(function (){
 
   $('.like_btn').each(function (){
@@ -75,5 +109,11 @@ $(document).ready(function (){
 });
   $('.undislike_btn').each(function (){
     $(this).click(undislikeClick);
+});
+  $('.Follow').each(function (){
+    $(this).click(followActionClick);
+});
+  $('.unFollow').each(function (){
+    $(this).click(unfollowActionClick);
 });
 })

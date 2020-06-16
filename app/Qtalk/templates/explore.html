@@ -41,7 +41,7 @@
       {% endif %}
     </div>
     <div class="">
-      {% if post.author != current_user %}
+      {% if post.author != current_user and current_user.is_authenticated %}
 
           {% if current_user.has_liked_post(post) %}
             <button type="button" id="like-{{post.id}}" class="btn btn-outline-success like_btn btn-sm ml-1 mr-1" style="display:none">لایک</button>

@@ -51,6 +51,22 @@ a.article-title:hover {
   margin-right: 16px;
 }
 
+.modal-img {
+  height: 85px;
+  width: 85px;
+  margin-right: 0px;
+  float: left;
+  margin-bottom: 20px;
+}
+
+.users-img {
+  height: 85px;
+  width: 85px;
+  margin-left: 10px;
+  float: left;
+  margin-top: 10px;
+}
+
 .article-metadata {
   padding-bottom: 1px;
   margin-bottom: 4px;

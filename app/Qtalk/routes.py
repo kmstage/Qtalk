@@ -20,7 +20,7 @@ def post_count(username):
     for post in posts:
         if post.date_posted.strftime('%Y-%m-%d') == today:
             count +=1
-    return 1
+    return count
 
 
 @app.route('/')
@@ -200,47 +200,38 @@ def user(username):
     posts = Post.query.filter_by(author=user)\
     .order_by(Post.date_posted.desc())\
     .paginate(page=page, per_page=25)
+    user_followers = user.followers.all()
+    user_followings = user.followed.all()
     return render_template('user_post.html', posts=posts,
                 user=user, form=form,
-                form2=form2, filename='/static/profile_pics/' + user.image_file)
+                form2=form2, filename='/static/profile_pics/' + user.image_file,
+                user_followers=user_followers,user_followings=user_followings)
 
 @app.route('/follow/<username>', methods=['POST'])
 @login_required
 def follow(username):
-    form = EmptyForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(username=username).first()
-        if user is None:
-            flash('کاربر مورد نظر یافت نشد', 'warning')
-            return redirect(url_for('explore'))
-        if user == current_user:
-            flash('خودتو ک نمیتونی فالو کنی :)', 'primary')
-            return redirect(url_for('explore'))
-        current_user.follow(user)
-        db.session.commit()
-        flash('شما {} را دنبال میکنید'.format(username), 'info')
-        return redirect(url_for('home'))
-    else:
-        return redirect(url_for('home'))
+    user = User.query.filter_by(username=username).first_or_404()
+    current_user.follow(user)
+    db.session.commit()
+    follower = user.followers.count()
+    following = user.followed.count()
+    return jsonify(result="followed",
+                   follower=follower,
+                   following=following,
+                   target=username)
 
 @app.route('/unfollow/<username>', methods=['POST'])
 @login_required
 def unfollow(username):
-    form = EmptyForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(username=username).first()
-        if user is None:
-            flash('کاربر مورد نظر یافت نشد', 'warning')
-            return redirect(url_for('explore'))
-        if user == current_user:
-            flash('خودتو ک نمیتونی آنفالو کنی :)', 'primary')
-            return redirect(url_for('explore'))
-        current_user.unfollow(user)
-        db.session.commit()
-        flash('کاربر {} دنبال نمیشود'.format(username), 'info')
-        return redirect(url_for('user',username=username))
-    else:
-        return redirect(url_for('explore'))
+    user = User.query.filter_by(username=username).first_or_404()
+    current_user.unfollow(user)
+    db.session.commit()
+    follower = user.followers.count()
+    following = user.followed.count()
+    return jsonify(result="unfollowed",
+                   follower=follower,
+                   following=following,
+                   target=username)
 
 @app.route('/like/<int:post_id>/<action>')
 @login_required

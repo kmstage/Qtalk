@@ -7,14 +7,14 @@
   <img src="{{ filename }}" style="width:100%">
   <h1>{{user.username}}</h1>
   <div class="row">
-    <div class="col " align="center">
+    <div class="col " align="center" data-toggle="modal" data-target="#followers">
         <h5>
-          {{ user.followers.count() }} <br/> <span> فالوور</span>
+          <my id="followers_count-{{user.username}}">{{ user.followers.count() }}</my> <br/> <span> فالوور</span>
         </h5>
     </div>
-    <div class="col" align="center">
-        <h5>
-          {{ user.followed.count() }} <br/> <span>فالوئینگ </span>
+    <div class="col" align="center"  data-toggle="modal" data-target="#followings">
+        <h5 >
+          <my id="following_count-{{user.username}}">{{ user.followed.count() }}</my> <br/> <span>فالوئینگ </span>
 
         </h5>
     </div>
@@ -38,18 +38,14 @@
   {% elif current_user.is_authenticated %}
       {% if not current_user.is_following(user) %}
   <p>
-      <form action="{{ url_for('follow', username=user.username) }}" method="post">
-          {{ form.hidden_tag() }}
-          {{ form.submit(value='فالو', class="btn btn-outline-success buttonp") }}
-      </form>
+    <button type="button" id="f-{{user.username}}" class="btn btn-outline-success buttonp Follow" style="display:inline">فالو</button>
+    <button type="button" id="u-{{user.username}}" class="btn btn-outline-danger buttonp unFollow" style="display:none">آنفالو</button>
   </p>
 
   {% else %}
   <p>
-      <form action="{{ url_for('unfollow', username=user.username) }}" method="post">
-          {{ form.hidden_tag() }}
-          {{ form.submit(value='آنفالو', class="btn btn-outline-danger buttonp") }}
-      </form>
+    <button type="button" id="u-{{user.username}}" class="btn btn-outline-danger buttonp unFollow" style="display:inline">آنفالو</button>
+    <button type="button" id="f-{{user.username}}" class="btn btn-outline-success buttonp Follow" style="display:none">فالو</button>
   </p>
   {% endif %}
   {% endif %}
@@ -198,4 +194,110 @@
   </div>
 </main>
 
+<!-- Modal -->
+<div class="modal fade" id="followers" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">فالوور ها</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      {% for user in user_followers %}
+      <div class="modal-body">
+        <div class="card">
+          <div class="card-body">
+            <div class="container">
+              <div class="row">
+                <div class="col">
+                  <h5 class="card-title mt-2">{{ user.username }}</h5>
+                  {% if user == current_user %}
+                  {% elif current_user.is_authenticated %}
+                      {% if not current_user.is_following(user) %}
+                  <p>
+                    <button type="button" id="f-{{user.username}}" class="mt-2 btn btn-outline-success Follow" style="display:inline;">فالو</button>
+                    <button type="button" id="u-{{user.username}}" class="mt-2 btn btn-outline-danger unFollow" style="display:none;">آنفالو</button>
+                  </p>
+
+                  {% else %}
+                  <p>
+                    <button type="button" id="u-{{user.username}}" class="mt-2 btn btn-outline-danger unFollow" style="display:inline;">آنفالو</button>
+                    <button type="button" id="f-{{user.username}}" class="mt-2 btn btn-outline-success Follow" style="display:none;">فالو</button>
+                  </p>
+                  {% endif %}
+                  {% endif %}
+                </div>
+                <div class="col">
+                  <img class="rounded-circle modal-img" src="{{ url_for('static', filename='profile_pics/'+ user.image_file) }}">
+                </div>
+              </div>
+              {% if user.status %}
+              <p class="text-center">{{user.status}}</p>
+              {% endif %}
+            </div>
+          </div>
+            </div>
+            </div>
+        {% endfor %}
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">خروج</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="followings" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">فالوئینگ ها</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      {% for user in user_followings %}
+      <div class="modal-body">
+        <div class="card">
+          <div class="card-body">
+            <div class="container">
+              <div class="row">
+                <div class="col">
+                  <h5 class="card-title mt-2">{{ user.username }}</h5>
+                  {% if user == current_user %}
+                  {% elif current_user.is_authenticated %}
+                      {% if not current_user.is_following(user) %}
+                  <p>
+                    <button type="button" id="f-{{user.username}}" class="mt-2 btn btn-outline-success Follow" style="display:inline;">فالو</button>
+                    <button type="button" id="u-{{user.username}}" class="mt-2 btn btn-outline-danger unFollow" style="display:none;">آنفالو</button>
+                  </p>
+
+                  {% else %}
+                  <p>
+                    <button type="button" id="u-{{user.username}}" class="mt-2 btn btn-outline-danger unFollow" style="display:inline;">آنفالو</button>
+                    <button type="button" id="f-{{user.username}}" class="mt-2 btn btn-outline-success Follow" style="display:none;">فالو</button>
+                  </p>
+                  {% endif %}
+                  {% endif %}
+                </div>
+                <div class="col">
+                  <img class="rounded-circle modal-img" src="{{ url_for('static', filename='profile_pics/'+ user.image_file) }}">
+                </div>
+              </div>
+              {% if user.status %}
+              <p class="text-center">{{user.status}}</p>
+              {% endif %}
+            </div>
+          </div>
+            </div>
+            </div>
+        {% endfor %}
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">خروج</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock content %}
