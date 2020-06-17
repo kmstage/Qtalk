@@ -27,7 +27,6 @@ if (data.state == 'like') {
 }
 
 function followResponse(data){
-  console.log(data.result)
   var username = data.target
   var follower = data.follower
   var following = data.following
@@ -41,6 +40,32 @@ function followResponse(data){
       $('#u-'+ username).css('display', 'none')
       $('#f-'+ username).css('display', 'inline')
 }
+}
+
+function likeCard(value) {
+  card =   `<div class="card border-success mb-3 text-center">
+              <div class="card-body text-success ">
+                <h5 class="card-title text-success"> <a style="color:#228B22" href="/user/${value}" >${value}</a> </h5>
+              </div>
+          </div>`
+  window.result = window.result + card ;
+}
+function dislikeCard(value) {
+  card =    `<div class="card border-danger mb-3 text-center">
+                <div class="card-body" text-danger>
+                  <h5 class="card-title text-danger"> <a style="color:#DC143C" href="/user/${value}" >${value}</a> </h5>
+                </div>
+            </div>`;
+  window.result = window.result + card ;
+}
+
+function showScoresModal(data){
+  window.result = ""
+  var modal = $('#scoreModal');
+  data.likes.forEach(likeCard)
+  data.dislikes.forEach(dislikeCard)
+  modal.find('.modal-scores').html(result);
+  modal.modal('show');
 }
 
 function likeClick(e){
@@ -95,7 +120,14 @@ function unfollowActionClick(e){
     success: followResponse
   });
 }
-
+function getScores(e){
+  var fid = $(this).attr('id');
+  var id = fid.slice(7)
+  $.ajax('/post/'+ id + '/scores' ,{
+    type: 'POST',
+    success: showScoresModal
+  });
+}
 $(document).ready(function (){
 
   $('.like_btn').each(function (){
@@ -115,5 +147,8 @@ $(document).ready(function (){
 });
   $('.unFollow').each(function (){
     $(this).click(unfollowActionClick);
+});
+  $('.show_score').each(function (){
+    $(this).click(getScores);
 });
 })

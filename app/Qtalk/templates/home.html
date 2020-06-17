@@ -59,7 +59,7 @@
             <button type="button" id="undislike-{{post.id}}" class="btn btn-danger undislike_btn btn-sm ml-1 mr-1" style="display:none">دیسلایک شده</button>
           {% endif %}
       {% endif %}
-      <p class="text-muted mr-4 mb-2" id="result-{{post.id}}" style="text-align:left">
+      <p class="text-muted mr-4 mb-2 show_score" id="result-{{post.id}}" style="text-align:left">
         {{ post.likes.count() }} لایک
   و
           {{ post.dislikes.count() }} دیسلایک

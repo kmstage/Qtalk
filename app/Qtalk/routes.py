@@ -11,6 +11,17 @@ from PIL import Image
 from datetime import datetime
 
 
+def find_username(user_id):
+    user = User.query.filter_by(id=user_id).first()
+    result = user.username
+    return result
+
+def score_list(scores):
+    result = []
+    for i in scores :
+        result.append(find_username(i.user_id))
+    return result
+
 def post_count(username):
     user = User.query.filter_by(username=username).first_or_404()
     posts = Post.query.filter_by(author=user).order_by(Post.date_posted.desc()).limit(5).all()
@@ -207,10 +218,10 @@ def user(username):
                 form2=form2, filename='/static/profile_pics/' + user.image_file,
                 user_followers=user_followers,user_followings=user_followings)
 
-@app.route('/follow/<username>', methods=['POST'])
+@app.route('/follow/<userid>', methods=['POST'])
 @login_required
-def follow(username):
-    user = User.query.filter_by(username=username).first_or_404()
+def follow(userid):
+    user = User.query.filter_by(id=userid).first_or_404()
     current_user.follow(user)
     db.session.commit()
     follower = user.followers.count()
@@ -218,12 +229,12 @@ def follow(username):
     return jsonify(result="followed",
                    follower=follower,
                    following=following,
-                   target=username)
+                   target=userid)
 
-@app.route('/unfollow/<username>', methods=['POST'])
+@app.route('/unfollow/<userid>', methods=['POST'])
 @login_required
-def unfollow(username):
-    user = User.query.filter_by(username=username).first_or_404()
+def unfollow(userid):
+    user = User.query.filter_by(id=userid).first_or_404()
     current_user.unfollow(user)
     db.session.commit()
     follower = user.followers.count()
@@ -231,7 +242,7 @@ def unfollow(username):
     return jsonify(result="unfollowed",
                    follower=follower,
                    following=following,
-                   target=username)
+                   target=userid)
 
 @app.route('/like/<int:post_id>/<action>')
 @login_required
@@ -310,3 +321,12 @@ def forbiden(e):
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('error.html',title='یافت نشد')
+
+@app.route("/post/<int:post_id>/scores", methods=['POST'])
+def scores(post_id):
+    post = Post.query.get_or_404(post_id)
+    likes = score_list(post.likes.all())
+    dislikes = score_list(post.dislikes.all())
+    return jsonify(post_id = post_id,
+                   likes = likes,
+                   dislikes = dislikes)

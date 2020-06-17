@@ -9,12 +9,12 @@
   <div class="row">
     <div class="col " align="center" data-toggle="modal" data-target="#followers">
         <h5>
-          <my id="followers_count-{{user.username}}">{{ user.followers.count() }}</my> <br/> <span> فالوور</span>
+          <my id="followers_count-{{user.id}}">{{ user.followers.count() }}</my> <br/> <span> فالوور</span>
         </h5>
     </div>
     <div class="col" align="center"  data-toggle="modal" data-target="#followings">
         <h5 >
-          <my id="following_count-{{user.username}}">{{ user.followed.count() }}</my> <br/> <span>فالوئینگ </span>
+          <my id="following_count-{{user.id}}">{{ user.followed.count() }}</my> <br/> <span>فالوئینگ </span>
 
         </h5>
     </div>
@@ -38,14 +38,14 @@
   {% elif current_user.is_authenticated %}
       {% if not current_user.is_following(user) %}
   <p>
-    <button type="button" id="f-{{user.username}}" class="btn btn-outline-success buttonp Follow" style="display:inline">فالو</button>
-    <button type="button" id="u-{{user.username}}" class="btn btn-outline-danger buttonp unFollow" style="display:none">آنفالو</button>
+    <button type="button" id="f-{{user.id}}" class="btn btn-outline-success buttonp Follow" style="display:inline">فالو</button>
+    <button type="button" id="u-{{user.id}}" class="btn btn-outline-danger buttonp unFollow" style="display:none">آنفالو</button>
   </p>
 
   {% else %}
   <p>
-    <button type="button" id="u-{{user.username}}" class="btn btn-outline-danger buttonp unFollow" style="display:inline">آنفالو</button>
-    <button type="button" id="f-{{user.username}}" class="btn btn-outline-success buttonp Follow" style="display:none">فالو</button>
+    <button type="button" id="u-{{user.id}}" class="btn btn-outline-danger buttonp unFollow" style="display:inline">آنفالو</button>
+    <button type="button" id="f-{{user.id}}" class="btn btn-outline-success buttonp Follow" style="display:none">فالو</button>
   </p>
   {% endif %}
   {% endif %}
@@ -106,7 +106,7 @@
         <button type="button" id="undislike-{{post.id}}" class="btn btn-danger undislike_btn btn-sm ml-1 mr-1" style="display:none">دیسلایک شده</button>
       {% endif %}
   {% endif %}
-  <p class="text-muted mr-4 mb-2" id="result-{{post.id}}" style="text-align:left">
+  <p class="text-muted mr-4 mb-2 show_score" id="result-{{post.id}}" style="text-align:left">
     {{ post.likes.count() }} لایک
 و
       {{ post.dislikes.count() }} دیسلایک
