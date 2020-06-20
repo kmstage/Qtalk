@@ -129,6 +129,25 @@ function getScores(e){
   });
 }
 $(document).ready(function (){
+      document.emojiButton = 'fa fa-smile-o';
+      document.emojiType = 'unicode';
+      document.emojiSource = '/static/img';
+
+    $(('[id="summernote"]')).summernote({
+      toolbar: [
+          ['style', ['bold', 'italic', 'underline', 'clear']],
+          ['fontsize', ['fontsize']],
+          ['color', ['color']],
+          ['insert', ['link', 'picture', 'video', 'emoji']],
+          ['para', ['ul', 'ol', 'paragraph']]
+
+],
+      tabsize: 2,
+      height: 300,
+      dialogsInBody: true,
+      disableDragAndDrop: true
+
+});
 
   $('.like_btn').each(function (){
     $(this).click(likeClick);

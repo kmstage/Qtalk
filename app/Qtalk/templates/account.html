@@ -99,7 +99,7 @@
             </div>
           {% endif %}
         <hr>
-        <p class="card-text article-content ">{{ post.content }}</p>
+        <p class="card-text article-content ">{{ post.content|safe  }}</p>
         {% if post.author.status %}
         <hr style="margin-top:30px; ">
         <small>{{post.author.status}}</small>

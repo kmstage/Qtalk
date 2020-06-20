@@ -17,7 +17,7 @@
     </div>
   {% endif %}
 <hr>
-<p class="card-text article-content ">{{ post.content }}</p>
+<p class="card-text article-content ">{{ post.content|safe  }}</p>
 <hr style="margin-top:30px; ">
 <small>{{post.author.status}}</small>
 </div>
@@ -59,7 +59,7 @@
           <filfieldset class="form-group ">
               <div class="form-group">
                   {% if form.content.errors %}
-                  {{ form.content(class="form-control form-control-lg is-invalid", rows="12" ) }}
+                  {{ form.content(id="summernote",class="form-control form-control-lg is-invalid", rows="12" ) }}
                     <div class="invalid-feedback">
                         {% for error in form.content.errors %}
                           <span>{{ error }}</span>
@@ -67,7 +67,7 @@
                     </div>
                   {% else %}
                       {% set f = form.content.process_data(post.content) %}
-                      {{ form.content(class="form-control form-control-lg", rows="12") }}
+                      {{ form.content(id="summernote",class="form-control form-control-lg", rows="12") }}
                   {% endif %}
               </div>
               <div class="modal-footer">

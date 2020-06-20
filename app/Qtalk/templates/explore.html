@@ -34,7 +34,7 @@
           </div>
         {% endif %}
       <hr>
-      <p class="card-text article-content ">{{ post.content }}</p>
+      <p class="card-text article-content ">{{ post.content|safe  }}</p>
       {% if post.author.status %}
       <hr style="margin-top:30px; ">
       <small>{{post.author.status}}</small>
@@ -120,7 +120,7 @@
             <filfieldset class="form-group ">
                 <div class="form-group">
                     {% if form.content.errors %}
-                    {{ form.content(class="form-control form-control-lg is-invalid", rows="12" ) }}
+                    {{ form.content(id="summernote",class="form-control form-control-lg is-invalid", rows="12" ) }}
                       <div class="invalid-feedback">
                           {% for error in form.content.errors %}
                             <span>{{ error }}</span>
@@ -128,7 +128,7 @@
                       </div>
                     {% else %}
                         {% set f = form.content.process_data(post.content) %}
-                        {{ form.content(class="form-control form-control-lg", rows="12") }}
+                        {{ form.content(id="summernote",class="form-control form-control-lg", rows="12") }}
                     {% endif %}
                 </div>
                 <div class="modal-footer">
@@ -158,14 +158,14 @@
               <filfieldset class="form-group ">
                   <div class="form-group">
                       {% if form2.content.errors %}
-                      {{ form2.content(class="form-control form-control-lg is-invalid") }}
+                      {{ form2.content(id="summernote", class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
                             {% for error in form2.content.errors %}
                               <span>{{ error }}</span>
                             {% endfor %}
                         </div>
                       {% else %}
-                          {{ form2.content(class="form-control form-control-lg", rows="10") }}
+                          {{ form2.content(id="summernote", class="form-control form-control-lg", rows="10") }}
                       {% endif %}
                   </div>
                   <div class="modal-footer">
