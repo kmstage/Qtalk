@@ -4,8 +4,9 @@ from os.path import splitext, join
 from flask import render_template, url_for, flash, redirect, request, abort, jsonify
 from Qtalk import app, db, bcrypt
 from Qtalk.forms import (RegistrationForm, LoginForm,
-                UpdateAccountForm, PostForm, UpdateForm, EmptyForm)
-from Qtalk.models import Post, User
+                UpdateAccountForm, PostForm, UpdateForm, EmptyForm,
+                CommentForm)
+from Qtalk.models import Post, User, Comment
 from flask_login import login_user, current_user, logout_user, login_required
 from PIL import Image
 from datetime import datetime
@@ -54,11 +55,18 @@ def first_page():
 @app.route('/home')
 @login_required
 def home():
+    last_time_home = current_user.last_time_home
+    if  not last_time_home:
+        last_time_home = datetime.now()
+    current_user.last_time_home = datetime.now()
+    db.session.commit()
     form = UpdateForm()
     postform = PostForm()
     page = request.args.get('page', 1, type=int)
     posts = current_user.followed_posts().paginate(page=page, per_page=25)
-    return render_template('home.html', posts=posts, form=form, form2=postform, title="خانه")
+    return render_template('home.html', posts=posts,
+                                form=form, form2=postform, title="خانه",
+                                last_time=last_time_home)
 
 @app.before_request
 def before_request():
@@ -68,15 +76,21 @@ def before_request():
 
 @app.route('/explore')
 def explore():
+    last_time_explore = current_user.last_time_explore
+    if  not last_time_explore:
+        last_time_explore = datetime.now()
+    current_user.last_time_explore = datetime.now()
+    db.session.commit()
     form = UpdateForm()
     postform = PostForm()
     page = request.args.get('page', 1, type=int)
     posts = Post.query.order_by(Post.date_posted.desc()).paginate(page=page, per_page=25)
-    return render_template('explore.html', posts=posts, form=form, form2=postform, title="کاوش")
+    return render_template('explore.html', posts=posts,
+                                form=form, form2=postform, title="کاوش",
+                                last_time=last_time_explore)
 
 @app.route('/about')
 def about():
-
     return render_template('about.html')
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -168,11 +182,25 @@ def new_post():
             return redirect(url_for('home'))
     return render_template('create_post.html', title='ارسال جدید', form=form)
 
+@app.route("/new_comment/<int:post_id>", methods=['POST'])
+@login_required
+def new_comment(post_id):
+    form = CommentForm()
+    if form.validate_on_submit():
+        content = form.content.data
+        comment = Comment(content=form.content.data, post_id=post_id, sender=current_user)
+        db.session.add(comment)
+        db.session.commit()
+        flash('نظر شما ارسال شد.', 'success')
+        return redirect(url_for('post', post_id=post_id))
+
+
 @app.route("/post/<int:post_id>")
 def post(post_id):
     form = UpdateForm()
+    form2 = CommentForm()
     post = Post.query.get_or_404(post_id)
-    return render_template('post.html', title=post.author.username, post=post, form=form)
+    return render_template('post.html', title=post.author.username, post=post, form=form, form2=form2)
 
 @app.route("/post/<int:post_id>/update", methods=['GET', 'POST'])
 @login_required

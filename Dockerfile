@@ -4,5 +4,7 @@ RUN pip install -r /var/www/requirements.txt
 ENV STATIC_URL /static
 ENV STATIC_PATH /app/Qtalk/static
 COPY ./app /app
-RUN python3 create_db.py
-
+#RUN python3 create_db.py
+#RUN python3 manage.py db init
+#RUN python3 manage.py db migrate
+#RUN python3 manage.py db upgrade

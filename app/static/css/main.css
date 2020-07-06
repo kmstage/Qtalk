@@ -12,6 +12,12 @@ h1, h2, h3, h4, h5, h6 {
   color: #444444;
 }
 
+.note-video-clip{
+  width: auto;
+  height: 500px;
+  align:center;
+}
+
 .bg-steel {
   background-color: #3d454d;
 }

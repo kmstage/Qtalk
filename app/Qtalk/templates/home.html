@@ -18,22 +18,28 @@
 
   {% for post in posts.items %}
       <div class="card" style="margin-top:30px;">
-  <div class="card-body">
-    <img class="rounded-circle article-img float-right" src="{{ url_for('static', filename='profile_pics/'+ post.author.image_file) }}">
-
+        <div class="card-body">
+          <img class="rounded-circle article-img float-right" src="{{ url_for('static', filename='profile_pics/'+ post.author.image_file) }}">
       <h5 class="card-title">
-
+        {% if post.author.username == "becar_asli" %}
+        <img class="float-right" style="width: 30px;" src="{{ url_for('static', filename='profile_pics/blue_tick.png') }}">
+        {% endif %}
         <a class="mr-4 float-right" href="{{url_for('user', username=post.author.username)}}">{{ post.author.username }}</a>
       </h5>
       <h6 class="card-subtitle mb-2 text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</h6>
+      {% if post.date_posted > last_time %}
+      <span class="badge badge-warning float-right">جدید</span>
+      {% endif %}
       {% if post.author == current_user %}
           <div>
             <button type="button" onclick="myFunction()" class="btn btn-primary btn-sm m-1" data-toggle="modal" data-target="#editModal-{{ post.id }}">ویرایش</button>
             <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal-{{ post.id }}">حذف</button>
           </div>
+      {% else %}
+            <br>
       {% endif %}
       <hr>
-      <p class="card-text article-content ">{{ post.content|safe }}</p>
+      <p class="card-text article-content " >{{ post.content|safe }}</p>
       {% if post.author.status %}
       <hr style="margin-top:20px; ">
       <small>{{post.author.status}}</small>
@@ -63,6 +69,9 @@
         {{ post.likes.count() }} لایک
   و
           {{ post.dislikes.count() }} دیسلایک
+          <div class="mb-4 ml-4">
+            <a href="{{url_for('post',post_id=post.id )}}" type="button" class="btn btn-light">{{post.comments|length}} نظر</a>
+          </div>
       </p>
     </div>
 

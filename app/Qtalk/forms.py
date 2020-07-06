@@ -64,6 +64,10 @@ class PostForm(FlaskForm):
     content = TextAreaField('پست جدید', validators=[DataRequired()])
     submit = SubmitField('ارسال')
 
+class CommentForm(FlaskForm):
+    content = TextAreaField(validators=[DataRequired()])
+    submit = SubmitField('ارسال نظر')
+
 class UpdateForm(FlaskForm):
     content = TextAreaField('پست جدید', validators=[DataRequired()])
     submit = SubmitField('ویرایش')

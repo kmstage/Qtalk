@@ -22,7 +22,10 @@ class User(db.Model, UserMixin):
     status = db.Column(db.String(300), nullable=True)
     last_seen = db.Column(db.DateTime, default=datetime.now)
     date_register = db.Column(db.DateTime, nullable=False, default=datetime.now)
+    last_time_explore = db.Column(db.DateTime, default=datetime.now)
+    last_time_home = db.Column(db.DateTime, default=datetime.now)
     posts = db.relationship('Post', backref='author', lazy=True)
+    comments = db.relationship('Comment', backref='sender', lazy=True)
     followed = db.relationship(
         'User', secondary=followers,
         primaryjoin=(followers.c.follower_id == id),
@@ -99,10 +102,21 @@ class Post(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     likes = db.relationship('PostLike', backref='post', lazy='dynamic')
     dislikes = db.relationship('PostDislike', backref='post', lazy='dynamic')
-
+    comments = db.relationship('Comment', backref='author', lazy=True)
 
     def __repr__(self):
         return f'User("{self.id}", "{self.date_posted}")'
+
+class Comment(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    date_commented = db.Column(db.DateTime, nullable=False, default=datetime.now)
+    content = db.Column(db.Text, nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+
+    def __repr__(self):
+        return f'User("{self.id}", "{self.content}")'
 
 class PostLike(db.Model):
     __tablename__ = 'post_like'

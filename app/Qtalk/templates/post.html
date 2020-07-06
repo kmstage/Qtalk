@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
-
+{% if current_user.is_authenticated %}
+<button type="button" class="fixedbutton btn" data-toggle="modal" title="ارسال نظر" data-target="#commentModal"><img src="{{url_for('static', filename='logo/add_btn.png')}}" width="65" height="65"></button>
+{% endif %}
 <div class="card" style="margin-top:30px;">
 <div class="card-body">
 <img class="rounded-circle article-img float-right" src="{{ url_for('static', filename='profile_pics/'+ post.author.image_file) }}">
@@ -22,7 +24,47 @@
 <small>{{post.author.status}}</small>
 </div>
 </div>
+<br>
+{% if post.comments %}
+{% for comment in post.comments %}
+<div class="card" style="margin:20px;">
+<div class="card-body">
+<img class="rounded-circle article-img float-right" src="{{ url_for('static', filename='profile_pics/'+ comment.sender.image_file) }}">
 
+<h5 class="card-title">
+
+  <a class="mr-4 float-right" href="{{url_for('user', username=comment.sender.username)}}">{{ comment.sender.username }}</a>
+</h5>
+<h6 class="card-subtitle mb-2 text-muted">{{ comment.date_commented.strftime('%Y-%m-%d') }}</h6>
+<hr>
+<p class="card-text article-content ">{{comment.content|safe}}</p>
+</div>
+</div>
+{% endfor %}
+{% endif %}
+<div class="content-section">
+  <legend class="border-bottom mb-4">ارسال نظر</legend>
+
+  <form method="POST" action="{{ url_for('new_comment', post_id=post.id) }}">
+      {{ form2.hidden_tag() }}
+      <filfieldset class="form-group ">
+          <div class="form-group">
+              {% if form2.content.errors %}
+              {{ form2.content(id="summernote", class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form2.content.errors %}
+                      <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+              {% else %}
+                  {{ form2.content(id="summernote", class="form-control form-control-lg") }}
+              {% endif %}
+          </div>
+          <div class="modal-footer">
+              {{ form2.submit(class="btn btn-outline-info") }}
+          </div>
+  </form>
+    </div>
 {% if post.author == current_user %}
 <div class="modal fade" id="deleteModal-{{ post.id }}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
@@ -80,5 +122,37 @@
   </div>
 </div>
 {% endif %}
-
+<div class="modal fade" id="commentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">ارسال نظر</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="{{ url_for('new_comment', post_id=post.id) }}">
+            {{ form2.hidden_tag() }}
+            <filfieldset class="form-group ">
+                <div class="form-group">
+                    {% if form2.content.errors %}
+                    {{ form2.content(id="summernote", class="form-control form-control-lg is-invalid") }}
+                      <div class="invalid-feedback">
+                          {% for error in form2.content.errors %}
+                            <span>{{ error }}</span>
+                          {% endfor %}
+                      </div>
+                    {% else %}
+                        {{ form2.content(id="summernote", class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    {{ form2.submit(class="btn btn-outline-info") }}
+                </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock content %}

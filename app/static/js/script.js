@@ -145,8 +145,13 @@ $(document).ready(function (){
       tabsize: 2,
       height: 300,
       dialogsInBody: true,
-      disableDragAndDrop: true
-
+      disableDragAndDrop: true,
+      callbacks:{
+	  	onImageLinkInsert:function(url){
+      $img = $('<img>').attr({ src: url, width:'100%'})
+      $(this).summernote('insertNode', $img[0]);
+		}
+	},
 });
 
   $('.like_btn').each(function (){

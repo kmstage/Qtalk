@@ -29,10 +29,6 @@
     </p>
   </div>
 
-  <a href="#"><i class="fa fa-dribbble"></i></a>
-  <a href="#"><i class="fa fa-twitter"></i></a>
-  <a href="#"><i class="fa fa-linkedin"></i></a>
-  <a href="#"><i class="fa fa-facebook"></i></a>
   {% if user == current_user %}
   <p><a href="{{ url_for('account') }}" class="btn btn-outline-info buttonp" role="button" aria-pressed="true">تنظیمات حساب کاربری</a></p>
   {% elif current_user.is_authenticated %}
@@ -73,7 +69,9 @@
 <img class="rounded-circle article-img float-right" src="{{ url_for('static', filename='profile_pics/'+ post.author.image_file) }}">
 
   <h5 class="card-title">
-
+    {% if post.author.username == "becar_asli" %}
+    <img class="float-right" style="width: 30px;" src="{{ url_for('static', filename='profile_pics/blue_tick.png') }}">
+    {% endif %}
     <a class="mr-4 float-right" href="{{url_for('user', username=post.author.username)}}">{{ post.author.username }}</a>
   </h5>
   <h6 class="card-subtitle mb-2 text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</h6>
@@ -110,6 +108,9 @@
     {{ post.likes.count() }} لایک
 و
       {{ post.dislikes.count() }} دیسلایک
+      <div class="mb-4 ml-4">
+        <a href="{{url_for('post',post_id=post.id )}}" type="button" class="btn btn-light">{{post.comments|length}} نظر</a>
+      </div>
   </p>
 </div>
 </div>
