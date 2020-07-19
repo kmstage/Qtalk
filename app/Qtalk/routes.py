@@ -225,6 +225,10 @@ def delete_post(post_id):
     post = Post.query.get_or_404(post_id)
     if post.author != current_user:
         abort(403)
+    if post.comments:
+        for comment in post.comments:
+            db.session.delete(comment)
+        
     db.session.delete(post)
     db.session.commit()
     flash('پست شما حذف شد', 'success')
