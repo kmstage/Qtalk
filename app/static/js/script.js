@@ -42,6 +42,13 @@ function followResponse(data){
 }
 }
 
+function deleteComment(data){
+  var comment_id = data.comment_id 
+  $('#comment-'+ comment_id).css('display', 'none')
+  var modal = $('#deleteCommentModal');
+  modal.modal('hide');
+}
+
 function likeCard(value) {
   card =   `<div class="card border-success mb-3 text-center">
               <div class="card-body text-success ">
@@ -128,6 +135,23 @@ function getScores(e){
     success: showScoresModal
   });
 }
+function deleteCommentModal(e){
+  var id = $(this).attr('id');
+  var result = `
+    <button type="button" class="btn btn-secondary" data-dismiss="modal">خروج</button>
+    <button type="button" class="btn btn-danger" id="delete-comment-${id}" >حذف</button>
+  `
+  var modal = $('#deleteCommentModal');
+  modal.find('.modal-delete-comment').html(result);
+  modal.modal('show');
+  $( "#delete-comment-"+ id ).click(function() {
+    $.ajax('/delete_comment/'+ id ,{
+      type: 'POST',
+      success: deleteComment
+    });
+  });
+}
+
 $(document).ready(function (){
       document.emojiButton = 'fa fa-smile-o';
       document.emojiType = 'unicode';
@@ -143,7 +167,7 @@ $(document).ready(function (){
 
 ],
       tabsize: 2,
-      height: 300,
+      height: 200,
       dialogsInBody: true,
       disableDragAndDrop: true,
       callbacks:{
@@ -174,5 +198,8 @@ $(document).ready(function (){
 });
   $('.show_score').each(function (){
     $(this).click(getScores);
+});
+$('.delete_comment_modal').each(function (){
+  $(this).click(deleteCommentModal);
 });
 })

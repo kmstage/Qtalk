@@ -194,6 +194,17 @@ def new_comment(post_id):
         flash('نظر شما ارسال شد.', 'success')
         return redirect(url_for('post', post_id=post_id))
 
+@app.route("/delete_comment/<int:comment_id>", methods=['POST'])
+@login_required
+def delete_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    if comment.sender == current_user or comment.author.author == current_user :
+        db.session.delete(comment)
+        db.session.commit()
+        return jsonify(status='ok', comment_id=comment.id)
+        
+    abort(403)
+        
 
 @app.route("/post/<int:post_id>")
 def post(post_id):
