@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div style="direction:ltr;text-align: left" class="mb-4">
+  {% for page_num in messages.iter_pages(left_edge=2, right_edge=2, left_current=1, right_current=2) %}
+        {% if page_num %}
+          {% if messages.page == page_num %}
+            <a class="btn btn-info" href="{{ url_for('explore', page=page_num) }}">{{ page_num }}</a>
+          {% else %}
+            <a class="btn btn-outline-info" href="{{ url_for('explore', page=page_num) }}">{{ page_num }}</a>
+          {% endif %}
+        {% else %}
+          ...
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% for message in messages.items %}
+    {% if message.recipient() != current_user %}
+    <div class="card text-center ml-4 mr-4">
+      <div class="card-body">
+        <div class="row">
+          <div class="col mt-2"  align="center">
+          <img class="rounded-circle users-img" style="float:right;margin-top:0px" src="{{ url_for('static', filename='profile_pics/'+ message.recipient().image_file) }}">
+          </div>
+          <div class="col ml-4" align="center">
+            <a href="{{url_for('conversation', username= message.recipient().username, unread=1)}}" class="btn btn-outline-info btn-lg" style="margin-top:25px">{{message.recipient().username}}</a>
+          </div>
+          <div class="col" align="center">
+            {% if message.new_messages(current_user)!=0 %}
+            <h3 style="margin-top:20px">
+          <a href="{{url_for('conversation', username= message.recipient().username, unread=1)}}" class="btn btn btn-danger" style="border-radius:30px"> {{message.new_messages(current_user)}} </a>
+          پیام جدید
+        </h3>
+        {% else %}
+        <h4 style="margin-top:20px">شما پیام جدیدی ندارید :)  </h4>
+        {% endif %}
+          </div>
+          <div class="col text-center" align="center">
+            <div class="mt-2">
+              آخرین پیام در تاریخ :
+              <br>
+              {{message.messages_info()['lastPmTime']}}
+              <br>
+              <br>
+              توسط :
+              {{message.messages_info()['lastPmSender']}}
+
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer text-muted">
+      اولین پیام در تاریخ :  {{message.date_created}}
+
+      </div>
+    </div>
+    {% else %}
+    <div class="card text-center ml-4 mr-4">
+      <div class="card-body">
+        <div class="row">
+          <div class="col mt-2"  align="center">
+          <img class="rounded-circle users-img" style="float:right;margin-top:0px" src="{{ url_for('static', filename='profile_pics/'+ message.sender().image_file) }}">
+          </div>
+          <div class="col ml-4" align="center">
+            <a href="{{url_for('conversation', username= message.sender().username, unread=1)}}" class="btn btn-outline-info btn-lg" style="margin-top:25px">{{message.sender().username}}</a>
+          </div>
+          <div class="col" align="center">
+            {% if message.new_messages(current_user)!=0 %}
+            <h3 style="margin-top:20px">
+          <a href="{{url_for('conversation', username= message.sender().username, unread=1)}}" class="btn btn btn-danger" style="border-radius:30px"> {{message.new_messages(current_user)}} </a>
+          پیام جدید
+        </h3>
+        {% else %}
+        <h4 style="margin-top:20px">شما پیام جدیدی ندارید :)  </h4>
+        {% endif %}
+          </div>
+          <div class="col text-center" align="center">
+            <div class="mt-2">
+              آخرین پیام در تاریخ :
+              <br>
+              {{message.messages_info()['lastPmTime']}}
+              <br>
+              <br>
+              توسط :
+              {{message.messages_info()['lastPmSender']}}
+
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer text-muted">
+      اولین پیام در تاریخ :  {{message.date_created}}
+
+      </div>
+    </div>
+    {% endif %}
+
+  <br>
+  {% endfor %}
+  <div style="direction:ltr;text-align: center;margin-top:20px;">
+    {% for page_num in messages.iter_pages(left_edge=2, right_edge=2, left_current=1, right_current=2) %}
+          {% if page_num %}
+            {% if messages.page == page_num %}
+              <a class="btn btn-info" href="{{ url_for('explore', page=page_num) }}">{{ page_num }}</a>
+            {% else %}
+              <a class="btn btn-outline-info" href="{{ url_for('explore', page=page_num) }}">{{ page_num }}</a>
+            {% endif %}
+          {% else %}
+            ...
+          {% endif %}
+        {% endfor %}
+      </div>
+
+{% endblock content%}

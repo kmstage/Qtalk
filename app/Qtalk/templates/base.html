@@ -51,6 +51,7 @@
     <div class="mx-auto order-0">
       <button class="navbar-toggler" style="position: relative;left:10px" type="button" data-toggle="collapse" data-target=".dual-collapse2">
           <span class="navbar-toggler-icon"></span>
+
       </button>
         <a class="navbar-brand mx-auto" href="#">
           <img src="{{ url_for('static', filename='logo/logo.png') }}" width="250" height="35" alt="">
@@ -59,6 +60,15 @@
     <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
         <ul class="navbar-nav ml-auto">
           {% if current_user.is_authenticated %}
+
+          <li class="nav-item">
+            <div class="row">
+                  <a href="{{url_for('messages')}}" class="btn btn btn-danger" style="border-radius:30px"> {{current_user.new_direct()}} </a>
+                <div class="col">
+                  <a class="nav-link" href="{{ url_for('messages') }}">پیام ها</a>
+                </div>
+            </div>
+          </li>
               <li class="nav-item">
                   <a class="nav-link" href="{{ url_for('account') }}">حساب کاربری</a>
               </li>

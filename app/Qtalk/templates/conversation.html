@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block content %}
+{% if messages %}
+<div style="direction:ltr;text-align: left">
+  {% for page_num in messages.iter_pages(left_edge=2, right_edge=2, left_current=1, right_current=2) %}
+        {% if page_num %}
+          {% if messages.page == page_num %}
+            <a class="btn btn-info" href="{{ url_for('conversation', username=title, page=page_num) }}">{{ page_num }}</a>
+          {% else %}
+            <a class="btn btn-outline-info" href="{{ url_for('conversation', username=title, page=page_num) }}">{{ page_num }}</a>
+          {% endif %}
+        {% else %}
+          ...
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% for message in messages.items %}
+  {% if message.direct_author == current_user %}
+  <div class="card mr-4" id="message-{{message.id}}"style="margin-top:30px;">
+    <div class="card-body">
+      <img class="rounded-circle article-img float-right" src="{{ url_for('static', filename='profile_pics/'+ message.direct_author.image_file) }}">
+  <h5 class="card-title">
+    <a class="mr-4 float-right" href="{{url_for('user', username=message.direct_author.username)}}">{{ message.direct_author.username }}</a>
+  </h5>
+  <h6 class="card-subtitle mb-2 text-muted">{{ message.date_posted.strftime('%Y-%m-%d') }}</h6>
+  {% if message.date_posted > last_seen %}
+  <span class="badge badge-warning float-right" id="new">جدید</span>
+  {% endif %}
+  {% if message.direct_author == current_user %}
+      <div>
+          <input class="btn btn-danger m-1 delete_message_modal" id="dm-{{ message.id }}" type="submit" value="حذف">
+      </div>
+      {% else %}
+      <br>
+    {% endif %}
+  <hr>
+  <p class="card-text article-content " >{{ message.content|safe }}</p>
+  </div>
+  </div>
+  {% else %}
+  <div class="card ml-4" id="message-{{message.id}}"style="margin-top:30px;">
+    <div class="card-body">
+      <img class="rounded-circle article-img float-right" src="{{ url_for('static', filename='profile_pics/'+ message.direct_author.image_file) }}">
+  <h5 class="card-title">
+    <a class="mr-4 float-right" href="{{url_for('user', username=message.direct_author.username)}}">{{ message.direct_author.username }}</a>
+  </h5>
+  <h6 class="card-subtitle mb-2 text-muted">{{ message.date_posted.strftime('%Y-%m-%d') }}</h6>
+  {% if message.date_posted > last_seen %}
+  <span class="badge badge-warning float-right"id="new">جدید</span>
+  {% endif %}
+  {% if message.direct_author == current_user %}
+      <div>
+          <input class="btn btn-danger m-1 delete_message_modal" id="dm-{{ message.id }}" type="submit" value="حذف">
+      </div>
+      {% else %}
+      <br>
+    {% endif %}
+  <hr>
+  <p class="card-text article-content " >{{ message.content|safe }}</p>
+  </div>
+  </div>
+  {% endif %}
+  {% endfor %}
+  {% endif %}
+  <div id="last"></div>
+  <div class="content-section mt-4">
+    <legend class="border-bottom mb-4">ارسال پیام</legend>
+
+    <form method="POST" action="{{ url_for('send_direct', recipient=title) }}">
+        {{ form.hidden_tag() }}
+        <filfieldset class="form-group ">
+            <div class="form-group">
+                {% if form.content.errors %}
+                {{ form.content(id="summernote", class="form-control form-control-lg is-invalid") }}
+                  <div class="invalid-feedback">
+                      {% for error in form.content.errors %}
+                        <span>{{ error }}</span>
+                      {% endfor %}
+                  </div>
+                {% else %}
+                    {{ form.content(id="summernote", class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                {{ form.submit(class="btn btn-outline-info") }}
+            </div>
+    </form>
+      </div>
+{% if messages %}
+  <div style="direction:ltr;text-align: center;margin-top:20px;">
+    {% for page_num in messages.iter_pages(left_edge=2, right_edge=2, left_current=1, right_current=2) %}
+          {% if page_num %}
+            {% if messages.page == page_num %}
+              <a class="btn btn-info" href="{{ url_for('conversation', username=title, page=page_num) }}">{{ page_num }}</a>
+            {% else %}
+              <a class="btn btn-outline-info" href="{{ url_for('conversation', username=title, page=page_num) }}">{{ page_num }}</a>
+            {% endif %}
+          {% else %}
+            ...
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+<script>
+$('#new')[0].scrollIntoView(true);
+</script>
+
+
+<div class="modal fade" id="deleteMessageModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">از پاک شدن پست اطمینان داری؟</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-footer modal-delete-message">
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock content%}

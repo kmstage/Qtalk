@@ -5,11 +5,12 @@ from flask import render_template, url_for, flash, redirect, request, abort, jso
 from Qtalk import app, db, bcrypt
 from Qtalk.forms import (RegistrationForm, LoginForm,
                 UpdateAccountForm, PostForm, UpdateForm, EmptyForm,
-                CommentForm)
-from Qtalk.models import Post, User, Comment
+                CommentForm, DirectForm)
+from Qtalk.models import Post, User, Comment, Direct, Conversation
 from flask_login import login_user, current_user, logout_user, login_required
 from PIL import Image
 from datetime import datetime
+from sqlalchemy import and_
 
 
 def find_username(user_id):
@@ -202,9 +203,9 @@ def delete_comment(comment_id):
         db.session.delete(comment)
         db.session.commit()
         return jsonify(status='ok', comment_id=comment.id)
-        
+
     abort(403)
-        
+
 
 @app.route("/post/<int:post_id>")
 def post(post_id):
@@ -239,7 +240,7 @@ def delete_post(post_id):
     if post.comments:
         for comment in post.comments:
             db.session.delete(comment)
-        
+
     db.session.delete(post)
     db.session.commit()
     flash('پست شما حذف شد', 'success')
@@ -249,6 +250,7 @@ def delete_post(post_id):
 def user(username):
     form = EmptyForm()
     form2 = UpdateForm()
+    direct_form = DirectForm()
     page = request.args.get('page', 1, type=int)
     user = User.query.filter_by(username=username).first_or_404()
     posts = Post.query.filter_by(author=user)\
@@ -259,7 +261,8 @@ def user(username):
     return render_template('user_post.html', posts=posts,
                 user=user, form=form,
                 form2=form2, filename='/static/profile_pics/' + user.image_file,
-                user_followers=user_followers,user_followings=user_followings)
+                user_followers=user_followers,user_followings=user_followings,
+                direct_form=direct_form)
 
 @app.route('/follow/<userid>', methods=['POST'])
 @login_required
@@ -373,3 +376,97 @@ def scores(post_id):
     return jsonify(post_id = post_id,
                    likes = likes,
                    dislikes = dislikes)
+
+@app.route("/delete_message/<int:message_id>", methods=['POST'])
+@login_required
+def delete_message(message_id):
+    message = Direct.query.get_or_404(message_id)
+    if message.direct_author == current_user :
+        conv = current_user.check_conversation(message.recipient_id)
+        if conv.messages_info()['count'] == 1:
+            db.session.delete(message)
+            db.session.delete(conv)
+        db.session.commit()
+        return jsonify(status='ok', message_id=message.id)
+
+    abort(403)
+
+@app.route("/send_message/<recipient>", methods=['POST'])
+@login_required
+def send_direct(recipient):
+    user = User.query.filter_by(username=recipient).first_or_404()
+    form = DirectForm()
+    conv = current_user.check_conversation(user.id)
+    if conv :
+        conv.date_midified = datetime.now()
+    else:
+        conv = Conversation(sender_id=current_user.id, recipient_id=user.id)
+        db.session.add(conv)
+
+    if conv.sender() == current_user:
+        conv.sender_last_seen = datetime.now()
+    else:
+        conv.recipient_last_seen = datetime.now()
+
+    if form.validate_on_submit():
+        msg = Direct(direct_author=current_user, direct_recipient=user, content=form.content.data)
+        db.session.add(msg)
+        db.session.commit()
+        flash('پیام ارسال شد','success')
+        return redirect(url_for('conversation', username=recipient, unread=1))
+
+@app.route('/messages')
+@login_required
+def messages():
+    current_user.last_direct_read_time = datetime.now()
+    db.session.commit()
+    page = request.args.get('page', 1, type=int)
+    messages = current_user.conversations().order_by(Conversation.date_midified.desc()).paginate(
+                                                                                    page=page, per_page=25)
+
+    return render_template('messages.html', messages=messages, title="پیام ها" )
+
+@app.route('/conversation/<username>')
+@login_required
+def conversation(username):
+    form = DirectForm()
+    user = User.query.filter_by(username=username).first_or_404()
+    conv = current_user.check_conversation(user.id)
+    if conv :
+        new_messages = conv.new_messages(current_user)
+        messages = Direct.query.filter(
+        and_(Direct.sender_id==current_user.id, Direct.recipient_id==user.id)| \
+        and_(Direct.sender_id==user.id ,Direct.recipient_id==current_user.id)).order_by(
+        Direct.date_posted)
+        page_count = int(len(messages.all())/25) if len(messages.all())%25==0 else int(len(messages.all())/25) +1
+        option = request.args.get('unread', 0, type=int )
+        if option == 0 :
+            page = request.args.get('page', 1, type=int)
+        else:
+            if len(messages.all())%25 < new_messages:
+                page = request.args.get('page', page_count-1, type=int)
+            else:
+                page = request.args.get('page', page_count, type=int)
+        messages=messages.paginate(page=page, per_page=25)
+
+        if conv.sender() == current_user:
+            last_seen = conv.sender_last_seen or datetime(1900, 1, 1)
+            if page == page_count:
+                conv.sender_last_seen = datetime.now()
+                db.session.commit()
+            else:
+                if messages.items[-1].date_posted > last_seen:
+                    conv.sender_last_seen = messages.items[-1].date_posted
+                    db.session.commit()
+        else:
+            last_seen = conv.recipient_last_seen or datetime(1900, 1, 1)
+            if page == page_count:
+                conv.recipient_last_seen = datetime.now()
+                db.session.commit()
+            else:
+                if messages.items[-1].date_posted > last_seen:
+                    conv.recipient_last_seen = messages.items[-1].date_posted
+                    db.session.commit()
+        return render_template('conversation.html', messages=messages,
+        form=form, title=user.username, last_seen=last_seen)
+    return render_template('conversation.html', form=form, title=user.username)

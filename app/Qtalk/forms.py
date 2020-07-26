@@ -74,3 +74,7 @@ class UpdateForm(FlaskForm):
 
 class EmptyForm(FlaskForm):
     submit = SubmitField('Submit')
+
+class DirectForm(FlaskForm):
+    content = TextAreaField('ارسال پیام', validators=[DataRequired()])
+    submit = SubmitField('ارسال')
