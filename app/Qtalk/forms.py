@@ -1,9 +1,11 @@
 from flask_wtf import FlaskForm
+from flask import flash
 from flask_wtf.file import FileField, FileAllowed
 from flask_login import current_user
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from Qtalk.models import User
+from Qtalk import bcrypt
 
 class RegistrationForm(FlaskForm):
     username = StringField('نام کاربری',
@@ -78,3 +80,22 @@ class EmptyForm(FlaskForm):
 class DirectForm(FlaskForm):
     content = TextAreaField('ارسال پیام', validators=[DataRequired()])
     submit = SubmitField('ارسال')
+
+class ChangePwdForm(FlaskForm):
+    old_password = PasswordField('کلمه عبور قدیمی',
+            validators=[DataRequired()])
+    new_password = PasswordField('کلمه عبور جدید',
+            validators=[DataRequired()])
+    confirm_new_password = PasswordField('تکرار کلمه عبور جدید',
+            validators=[DataRequired(), EqualTo('new_password')])
+    submit = SubmitField('تغیر کلمه عبور')
+
+    def validate_old_password(self, old_password):
+        if not(bcrypt.check_password_hash(current_user.password,old_password.data)):
+            flash('کلمه عبور قدیمی شما اشتباه است !!!', 'danger')
+            raise ValidationError('کلمه عبور قدیمی شما اشتباه است !!!')
+
+    def validate_new_password(self, new_password):
+        if not(self.confirm_new_password.data == new_password.data):
+            flash('کلمه عبور جدید مطابقت ندارد !!!', 'danger')
+            raise ValidationError('کلمه عبور جدید مطابقت ندارد !!!')

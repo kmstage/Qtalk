@@ -5,7 +5,7 @@ from flask import render_template, url_for, flash, redirect, request, abort, jso
 from Qtalk import app, db, bcrypt
 from Qtalk.forms import (RegistrationForm, LoginForm,
                 UpdateAccountForm, PostForm, UpdateForm, EmptyForm,
-                CommentForm, DirectForm)
+                CommentForm, DirectForm, ChangePwdForm)
 from Qtalk.models import Post, User, Comment, Direct, Conversation
 from flask_login import login_user, current_user, logout_user, login_required
 from PIL import Image
@@ -149,6 +149,7 @@ def account():
     .order_by(Post.date_posted.desc())\
     .paginate(page=page, per_page=25)
     form = UpdateAccountForm()
+    form2 = ChangePwdForm()
     if form.validate_on_submit():
         if form.picture.data:
             picture_file = save_picture(form.picture.data)
@@ -164,7 +165,7 @@ def account():
 
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
     return render_template('account.html', title='حساب کاربری',
-                            image_file=image_file, form=form, posts=posts)
+                            image_file=image_file, form=form, form2=form2, posts=posts)
 
 @app.route("/post/new", methods=['GET', 'POST'])
 @login_required
@@ -470,3 +471,16 @@ def conversation(username):
         return render_template('conversation.html', messages=messages,
         form=form, title=user.username, last_seen=last_seen)
     return render_template('conversation.html', form=form, title=user.username)
+
+@app.route('/change_pwd', methods=['POST'])
+def change_pwd():
+    form = ChangePwdForm()
+    if form.validate_on_submit():
+        new_hashed_pass = bcrypt.generate_password_hash(form.new_password.data).decode('utf-8')
+        current_user.password = new_hashed_pass
+        db.session.commit()
+        logout_user()
+        flash('میتونید با رمزجدید login کنید :) ', 'success')
+        return redirect(url_for('login'))
+    else:
+        return redirect(url_for('account'))
