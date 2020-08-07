@@ -41,7 +41,9 @@
               {{ form.submit(class="btn btn-outline-info mt-4") }}
           </div>
           <small class="text-muted mr-2">
-              <a href="#">رمز عبورتان را فراموش کردید؟ </a>
+                       <a href="#" data-toggle="modal" data-target="#forgotPasswordModal">
+                         رمز عبورتان را فراموش کردید؟
+                       </a>
           </small>
       </form>
       <div class="border-top pt-3">
@@ -50,4 +52,41 @@
           </small>
       </div>
   </div>
+
+  <div class="modal fade" id="forgotPasswordModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">  بازیابی حساب کاربری</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form method="POST" action="{{ url_for('reset_request') }}">
+              {{ form2.hidden_tag() }}
+              <filfieldset class="form-group ">
+                  <div class="form-group">
+                    ایمیل خودرا وارد کنید.
+                      {% if form2.email.errors %}
+                      {{ form2.email(class="form-control form-control-lg is-invalid mt-2") }}
+                        <div class="invalid-feedback">
+                            {% for error in form2.email.errors %}
+                              <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                      {% else %}
+                          {{ form2.email(class="form-control form-control-lg mt-2") }}
+                      {% endif %}
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">انصراف</button>
+                    {{ form2.submit(class="btn btn-outline-info") }}
+                  </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
 {% endblock content%}

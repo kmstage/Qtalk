@@ -99,3 +99,25 @@ class ChangePwdForm(FlaskForm):
         if not(self.confirm_new_password.data == new_password.data):
             flash('کلمه عبور جدید مطابقت ندارد !!!', 'danger')
             raise ValidationError('کلمه عبور جدید مطابقت ندارد !!!')
+
+class RequestResetForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('درخواست ایمیل بازیابی !')
+
+    def validate_email(self, email):
+        user = User.query.filter_by(email=email.data).first()
+        if user is None:
+            flash('حسابی با ایمیل شما وجود ندارد. ابتدا باید ثبت‌نام کنید !', 'danger')
+            raise ValidationError('حسابی با ایمیل شما وجود ندارد. ابتدا باید ثبت‌نام کنید !')
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField('کلمه عبور جدید',
+            validators=[DataRequired()])
+    confirm_password = PasswordField('تکرار کلمه عبور جدید',
+            validators=[DataRequired()])
+    submit = SubmitField('تغیر کلمه عبور')
+
+    def validate_password(self, password):
+        if not(self.confirm_password.data == password.data):
+            flash('کلمه عبور جدید مطابقت ندارد !!!', 'danger')
+            raise ValidationError('کلمه عبور جدید مطابقت ندارد !!!')

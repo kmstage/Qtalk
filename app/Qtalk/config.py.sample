@@ -10,3 +10,7 @@ db_name=''
 '''admin data'''
 emails=['list of emails']
 usernames=['list of usernames']
+
+'''email data'''
+mail_username = 'your email'
+mail_password = 'the password'

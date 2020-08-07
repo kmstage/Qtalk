@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+
+  <div class="card">
+  <div class="card-header">
+    از اینجا میتونین اکانت خودتونو بازیابی کنین :)
+  </div>
+  <div class="card-body">
+    <blockquote class="blockquote mb-0">
+      <form method="POST" action="">
+          {{ form.hidden_tag() }}
+          <filfieldset class="form-group ">
+              <div class="form-group">
+                <p class="mb-4 mt-4">  کلمه عبور جدید :</p>
+
+                  {% if form.password.errors %}
+                  {{ form.password(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.password.errors %}
+                          <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                  {% else %}
+                      {{ form.password(class="form-control form-control-lg ") }}
+                  {% endif %}
+                  <p class="mt-4 mb-4">  تکرار کلمه عبور جدید :‌</p>
+
+                  {% if form.confirm_password.errors %}
+                  {{ form.confirm_password(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.confirm_password.errors %}
+                          <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                  {% else %}
+                      {{ form.confirm_password(class="form-control form-control-lg") }}
+                  {% endif %}
+              </div>
+              <div class="modal-footer">
+                  {{ form.submit(class="btn btn-outline-info") }}
+              </div>
+      </form>
+    </blockquote>
+  </div>
+</div>
+{% endblock content%}

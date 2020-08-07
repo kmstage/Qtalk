@@ -1,4 +1,6 @@
 from Qtalk import db, login_manager, app
+from .config import app_secret_key
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from datetime import datetime
 from flask_login import UserMixin
 from sqlalchemy import and_
@@ -49,6 +51,19 @@ class User(db.Model, UserMixin):
 
     def __repr__(self):
         return f'User("{self.username}", "{self.email}", "{self.image_file}")'
+
+    def get_reset_token(self):
+        s = Serializer(app_secret_key, 7200)
+        return s.dumps({'user_id' : self.id})
+
+    @staticmethod
+    def verify_reset_token(token):
+        s = Serializer(app_secret_key)
+        try:
+            user_id = s.loads(token)['user_id']
+        except:
+            return None
+        return User.query.get(user_id)
 
     def follow(self, user):
         if not self.is_following(user):

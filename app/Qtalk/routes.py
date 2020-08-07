@@ -2,15 +2,17 @@ from secrets import token_hex
 from Qtalk.config import emails, usernames
 from os.path import splitext, join
 from flask import render_template, url_for, flash, redirect, request, abort, jsonify
-from Qtalk import app, db, bcrypt
+from Qtalk import app, db, bcrypt, mail
 from Qtalk.forms import (RegistrationForm, LoginForm,
                 UpdateAccountForm, PostForm, UpdateForm, EmptyForm,
-                CommentForm, DirectForm, ChangePwdForm)
+                CommentForm, DirectForm, ChangePwdForm, RequestResetForm,
+                ResetPasswordForm)
 from Qtalk.models import Post, User, Comment, Direct, Conversation
 from flask_login import login_user, current_user, logout_user, login_required
 from PIL import Image
 from datetime import datetime
 from sqlalchemy import and_
+from flask_mail import Message
 
 
 def find_username(user_id):
@@ -35,12 +37,25 @@ def post_count(username):
             count +=1
     return count
 
+def send_reset_email(user):
+    token = user.get_reset_token()
+    msg = Message('درخواست بازیابی حساب کاربری',
+                  sender='noreply@Qtalk.ir',
+                  recipients=[user.email])
+    msg.body = f'''برای بازیابی حساب خود از لینک زیر استفاده کنید:
+                        {url_for('reset_token', token=token, _external=True)}
+                        این پیام تا ۲ ساعت معتبر است.
+                        اگر شما درخواست بازیابی حساب خودرا نفرستاده اید -> این پیام را نادیده بگیرید!
+                        '''
+    mail.send(msg)
+
 
 @app.route('/')
 def first_page():
     if current_user.is_authenticated:
         return redirect(url_for('home'))
     form = LoginForm()
+    form2 = RequestResetForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username = form.username.data).first()
         if user and bcrypt.check_password_hash(user.password,form.password.data):
@@ -51,7 +66,7 @@ def first_page():
         else:
             flash('نام کاربری یا کلمه عبور اشتباه است', 'danger')
 
-    return render_template('first_page.html', form=form)
+    return render_template('first_page.html', form=form, form2=form2)
 
 @app.route('/home')
 @login_required
@@ -113,6 +128,7 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for('home'))
     form = LoginForm()
+    form2 = RequestResetForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username = form.username.data).first()
         if user and bcrypt.check_password_hash(user.password,form.password.data):
@@ -123,7 +139,7 @@ def login():
         else:
             flash('نام کاربری یا کلمه عبور اشتباه است', 'danger')
 
-    return render_template('login.html', title='ورود', form=form)
+    return render_template('login.html', title='ورود', form=form, form2=form2)
 
 @app.route('/logout')
 def logout():
@@ -484,3 +500,34 @@ def change_pwd():
         return redirect(url_for('login'))
     else:
         return redirect(url_for('account'))
+
+
+@app.route("/reset_password", methods=['POST'])
+def reset_request():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    form = RequestResetForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        send_reset_email(user)
+        flash('ایمیل بازیابی حساب شما ارسال شده است !', 'info')
+        return redirect(url_for('login'))
+    return redirect(url_for('login'))
+
+
+@app.route("/reset_password/<token>", methods=['GET', 'POST'])
+def reset_token(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    user = User.verify_reset_token(token)
+    if user is None:
+        flash('لینک بازیابی حساب شما معتبر نمیباشد !!!', 'warning')
+        return redirect(url_for('login'))
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        user.password = hashed_password
+        db.session.commit()
+        flash('میتوانید با پسورد جدید لاگین کنید !!!', 'success')
+        return redirect(url_for('login'))
+    return render_template('reset_token.html', title='بازیابی کلمه عبور', form=form)
